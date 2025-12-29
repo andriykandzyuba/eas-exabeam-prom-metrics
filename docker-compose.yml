@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    container_name: otel_python_app
+    ports:
+      - "8000:8000"
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.142.0
+    container_name: otel_collector
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    depends_on:
+      - app
