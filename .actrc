@@ -1,0 +1,6 @@
+-P ubuntu-latest=dynatrace/ubuntu-buildah:act-20.04-kind
+-P macos-latest=-self-hosted
+-P windows-latest=-self-hosted
+--container-architecture=linux/arm64
+--container-daemon-socket=unix:///run/podman/podman.sock
+--userns=host

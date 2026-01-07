@@ -1,0 +1,76 @@
+name: Build Image Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - features/*
+    tags:
+      - 'v*.*.*' # Triggers for tags starting with 'v'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    # Required if using OIDC for authentication in 2026
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Debug
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Ref Name: ${{ github.ref_name }}"
+          echo "SHA: ${{ github.sha }}"
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Create registry config file
+        run: |
+          mkdir -p $HOME/.config/containers
+          cat <<EOF > $HOME/.config/containers/registries.conf
+          unqualified-search-registries = ["docker.io", "${{ env.REGISTRY_URL }}"]
+
+          [[registry]]
+          location = "${{ env.REGISTRY_URL }}"
+          insecure = true
+          EOF
+          
+          # Verify file contents
+          cat $HOME/.config/containers/registries.conf
+
+      - name: Prepare Kubernetes Config
+        # Decodes the base64-encoded KUBE_CONFIG_DATA secret
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        run: |
+          mkdir -p $HOME/.kube
+          echo "$KUBE_CONFIG_DATA" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Build Container Image with Buildah
+        uses: redhat-actions/buildah-build@v2
+        id: buildah
+        with:
+          image: ${{ github.repository }}
+          tags: |
+            ${{ github.ref_name }}
+          containerfiles: ./Dockerfile
+          context: .
+
+      - name: List images in Podman/Minikube
+        run: |
+          podman images --all
+
+      - name: Push to JFrog Artifactory
+        uses: redhat-actions/push-to-registry@v2
+        id: push
+        with:
+          image: ${{ steps.buildah.outputs.image }}
+          tags: ${{ steps.buildah.outputs.tags }}
+          # The full registry path should include your JFrog URL and repository name
+          registry: ${{ env.REGISTRY_URL }}
+          tls-verify: false # Set to true if you use a trusted certificate
