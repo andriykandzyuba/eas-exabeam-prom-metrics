@@ -3,16 +3,19 @@ kind: ClusterRole
 metadata:
   name: otel-collector-cluster-role
 rules:
-  - apiGroups: [""]
+  - apiGroups: [ "", "apps", "batch" ] # Ensure these are properly grouped
     resources:
       - pods
       - namespaces
       - nodes
       - services
-    verbs:
-      - get
-      - list
-      - watch
+      - replicasets
+      - deployments
+      - daemonsets
+      - statefulsets
+      - jobs        # Part of 'batch'
+      - cronjobs    # Part of 'batch'
+    verbs: [ "get", "list", "watch" ]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -26,4 +29,3 @@ roleRef:
   kind: ClusterRole
   name: otel-collector-cluster-role # Name of the ClusterRole created above
   apiGroup: rbac.authorization.k8s.io
-
