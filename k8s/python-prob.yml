@@ -46,20 +46,16 @@ spec:
     spec:
       containers:
         - name: python-web-service
-          image: localhost:5000/eas-exabeam-prom-metrics:latest # Replace with your actual image
+          image: localhost/dynatrace/eas-exabeam-prom-metrics:v0.0.2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
               name: http-metrics
           env:
-            # Example environment variable for OpenTelemetry configuration
-            # which many Python OTel SDKs respect automatically.
             - name: OTEL_METRICS_EXPORTER
               value: "prometheus"
-            # Example environment variable for service name
             - name: OTEL_SERVICE_NAME
               value: "my-python-app"
-            # Optional: resource requests/limits for production readiness
           resources:
             limits:
               cpu: "200m"

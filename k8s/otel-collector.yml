@@ -16,10 +16,10 @@ spec:
                   namespaces:
                     names:
                       - dev  # Explicitly include the dev namespace
-              #metric_relabel_configs:
-              #  - source_labels: [__name__]
-              #    regex: '^.*_bucket.*'
-              #    action: drop
+              metric_relabel_configs:
+                - source_labels: [__name__]
+                  regex: '^.*_bucket.*'
+                  action: drop
               relabel_configs:
                 - action: labelmap
                   regex: __meta_kubernetes_pod_label_(.+)
