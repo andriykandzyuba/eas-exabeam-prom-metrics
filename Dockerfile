@@ -14,7 +14,10 @@ USER appuser
 
 # Copy installed dependencies and source code
 COPY --from=builder /root/.local /home/appuser/.local
-COPY . .
+COPY app ./app
 
 ENV PATH=/home/appuser/.local/bin:$PATH
-CMD ["python", "-u", "app.py"]
+
+EXPOSE 8000
+
+CMD ["python", "-u", "app/main.py"]
