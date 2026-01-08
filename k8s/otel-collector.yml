@@ -25,9 +25,9 @@ spec:
                   action: keep
                 - regex: (name|label_.*|__name__|__replica__|activity_name|actual_search_duration_bucket|agent_type|alert_type|api|app|app_version|application_name|area|bucket_at_first_byte|bucket_name|cache|cache_manager|call|cert_name|ch_instance|cluster|collectionFullName|collector.*|component|component_id|condition|config|connection_security_policy|container|container_name|contextName|controller|controller_id|counter_type|customer_id|customerId|customer_name|daemonset|database|datasource|date|deployment|destination_.*|device|dispatcher|display_name|domain|ecp.*|endpoint|endpoint_path|entity_type|entry_status|error|error_code|error_field|error_type|event|event_type|exa.*|exception|executor_key|exported_namespace|external_service|feature_flag_name|field|fstype|gc|group_version_kind|grpc_response_status|handler|health_type|horizontalpodautoscaler|image|instance_group_name|instance_id|interface|interval|job|jobStatus|jobType|job_name|job_type|key|latency_bucket|le|loader_name|location|log_format|log_group|lt_search|memory_id|method|metric_name|metrics_path|module|mongodb_name|msg_type|namespace|node|notification_name|outcome|outcome_type|owner_kind|owner_name|parser|path|persistentvolume|persistentvolumeclaim|phase|pod|poddisruptionbudget|pool|priority|product|project_id|protocol|publisher_name|quantile|rbe_name|rbe_type|reason|region|remote_name|reparsing_job_id|replicaset|reporter|request_protocol|resource|response_code|response_flags|result|route|routing_folder|sc_id|schedule|scrape_job|secret_name|service_name|set|sha256|site_id|source.*|state|statefulset|status|status_code|storageclass|stream_id|subscription_code|subscription_id|subscription_name|table|table_id|table_name|tag|target_name|topic|type|unit|update_type|uri|url|user|user_supplied_search_duration_bucket|vendor|version|webhook|workflow_type)
                   action: labelkeep
-                #- source_labels: [__name__]
-                #  regex: '^.*_bucket.*'
-                #  action: drop
+                - source_labels: [__name__]
+                  regex: '^.*_bucket.*'
+                  action: drop
               relabel_configs:
                 - action: keep
                   regex: true;true
@@ -58,6 +58,55 @@ spec:
                 #  source_labels:
                 #    - __meta_kubernetes_pod_node_name
     processors:
+      batch/metrics:
+        send_batch_max_size: 5000
+        send_batch_size: 500
+        timeout: 10s
+      cumulativetodelta:
+        max_staleness: 3m
+      k8sattributes:
+        extract:
+          annotations:
+            - from: pod
+              key_regex: metadata.dynatrace.com/(.*)
+              tag_name: $$1
+            - from: pod
+              key: metadata.dynatrace.com
+              tag_name: metadata.dynatrace.com
+          metadata:
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.pod.ip
+            - k8s.deployment.name
+            - k8s.replicaset.name
+            - k8s.statefulset.name
+            - k8s.daemonset.name
+            - k8s.job.name
+            - k8s.cronjob.name
+            - k8s.namespace.name
+            - k8s.node.name
+            - k8s.cluster.uid
+            - k8s.container.name
+            - k8s.deployment.uid
+            - k8s.replicaset.uid
+            - k8s.statefulset.uid
+            - k8s.daemonset.uid
+            - k8s.job.uid
+            - k8s.cronjob.uid
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.name
+              - from: resource_attribute
+                name: k8s.namespace.name
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.ip
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.uid
+          - sources:
+              - from: connection
       memory_limiter:
         check_interval: 1s
         limit_percentage: 75
@@ -137,5 +186,10 @@ spec:
       pipelines:
         metrics:
           receivers: [prometheus]
-          processors: [memory_limiter, batch]
+          processors:
+            - memory_limiter
+            - cumulativetodelta
+            - k8sattributes
+            - transform
+            - batch/metrics
           exporters: [debug]
