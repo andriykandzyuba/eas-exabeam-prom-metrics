@@ -46,7 +46,7 @@ spec:
     spec:
       containers:
         - name: python-web-service
-          image: localhost/dynatrace/eas-exabeam-prom-metrics:v0.0.2
+          image: localhost/dynatrace/eas-exabeam-prom-metrics:v0.0.3
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
