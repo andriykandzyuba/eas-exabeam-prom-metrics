@@ -7,6 +7,16 @@ on:
       - features/*
     tags:
       - 'v*.*.*' # Triggers for tags starting with 'v'
+    workflow_dispatch:
+      environment:
+        description: 'Select the deployment environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - stage
+          - prod
+        default: dev
 
 # Required if using OIDC for authentication in 2026
 permissions:
@@ -16,7 +26,7 @@ permissions:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
+    environment: ${{ inputs.environment }}
     steps:
       - name: Debug
         run: |
