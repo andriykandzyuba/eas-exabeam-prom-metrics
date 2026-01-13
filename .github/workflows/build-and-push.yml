@@ -33,6 +33,7 @@ jobs:
           az version
           echo "ACTIONS_ID_TOKEN_REQUEST_URL = $ACTIONS_ID_TOKEN_REQUEST_URL"
           echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN = $ACTIONS_ID_TOKEN_REQUEST_TOKEN"
+          echo "AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}"
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
