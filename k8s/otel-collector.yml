@@ -1,0 +1,209 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: opentelemetry-collector
+  namespace: opentelemetry-operator
+spec:
+  env:
+    - name: K8S_NODE_NAME
+      value: "minikube-node-1"
+    - name: DT_ENDPOINT  # Name used in your application
+      valueFrom:
+        configMapKeyRef:
+          name: opentelemetry-collector-config
+          key: DT_ENDPOINT
+    - name: DT_OTEL_COLLECTOR_METRICS_INGEST_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: LS_TOKEN
+          name: opentelemetry-collector-secret
+  config:
+    receivers:
+      prometheus:
+        config:
+          scrape_configs:
+            - job_name: 'kubernetes-pods'
+              scrape_interval: 5s
+              kubernetes_sd_configs:
+                - role: pod
+                  namespaces:
+                    names:
+                      - dev  # Explicitly include the dev namespace
+              metric_relabel_configs:
+                - source_labels: [__name__]
+                  regex: (container_memory_.*|ecp.*|exa.*|alloy.+|apigee_requests_.*|beam_.*|caffeine_cache_.*|certmanager.*|cluster_.+|configconnector_applied_resources_total|controller_.*|envoy_.*|executor_.+|exporter_.+|external_dns_.*|externalsecret_.+|galley_validation_failed|galley_validation_passed|gnatsd_.*|go_.+|health_check_status|http_server_requests_.+|http_request_duration_second.*|http_request_total|istio_.*|jvm_.+|kube_.*|kubefedcluster.*|mongodb_.*|pilot_.*|process_.+|prometheus_.+|promhttp_metric_handler_requests_total|promtail_.*|receiver_.+|rest_client_requests_total|rpc_.+|scrape_duration_seconds|sidecar_.*|stackdriver_.+|up|uptime|velero_.*|vpa_.*|workqueue_.+)
+                  action: keep
+                - regex: (name|label_.*|__name__|__replica__|activity_name|actual_search_duration_bucket|agent_type|alert_type|api|app|app_version|application_name|area|bucket_at_first_byte|bucket_name|cache|cache_manager|call|cert_name|ch_instance|cluster|collectionFullName|collector.*|component|component_id|condition|config|connection_security_policy|container|container_name|contextName|controller|controller_id|counter_type|customer_id|customerId|customer_name|daemonset|database|datasource|date|deployment|destination_.*|device|dispatcher|display_name|domain|ecp.*|endpoint|endpoint_path|entity_type|entry_status|error|error_code|error_field|error_type|event|event_type|exa.*|exception|executor_key|exported_namespace|external_service|feature_flag_name|field|fstype|gc|group_version_kind|grpc_response_status|handler|health_type|horizontalpodautoscaler|image|instance_group_name|instance_id|interface|interval|job|jobStatus|jobType|job_name|job_type|key|latency_bucket|le|loader_name|location|log_format|log_group|lt_search|memory_id|method|metric_name|metrics_path|module|mongodb_name|msg_type|namespace|node|notification_name|outcome|outcome_type|owner_kind|owner_name|parser|path|persistentvolume|persistentvolumeclaim|phase|pod|poddisruptionbudget|pool|priority|product|project_id|protocol|publisher_name|quantile|rbe_name|rbe_type|reason|region|remote_name|reparsing_job_id|replicaset|reporter|request_protocol|resource|response_code|response_flags|result|route|routing_folder|sc_id|schedule|scrape_job|secret_name|service_name|set|sha256|site_id|source.*|state|statefulset|status|status_code|storageclass|stream_id|subscription_code|subscription_id|subscription_name|table|table_id|table_name|tag|target_name|topic|type|unit|update_type|uri|url|user|user_supplied_search_duration_bucket|vendor|version|webhook|workflow_type)
+                  action: labelkeep
+                #- source_labels: [__name__]
+                #  regex: '^.*_bucket.*'
+                #  action: drop
+              relabel_configs:
+                - action: keep
+                  regex: true;true
+                  source_labels:
+                    - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+                    - __meta_kubernetes_pod_annotationpresent_prometheus_io_scrape
+                - action: replace
+                  regex: (.+?)(?::\d+)?;(\d+);true
+                  replacement: $$1:$$2
+                  source_labels:
+                    - __address__
+                    - __meta_kubernetes_pod_annotation_prometheus_io_port
+                    - __meta_kubernetes_pod_annotationpresent_prometheus_io_port
+                  target_label: __address__
+                - action: replace
+                  regex: (.+);true
+                  source_labels:
+                    - __meta_kubernetes_pod_annotation_prometheus_io_path
+                    - __meta_kubernetes_pod_annotationpresent_prometheus_io_path
+                  target_label: __metrics_path__
+                - action: drop
+                  regex: (Failed|Succeeded)
+                  source_labels:
+                    - __meta_kubernetes_pod_phase
+                # @ToDo: Enable node filtering if required
+                #- action: keep
+                #  regex: ${env:K8S_NODE_NAME}
+                #  source_labels:
+                #    - __meta_kubernetes_pod_node_name
+    processors:
+      batch/metrics:
+        send_batch_max_size: 5000
+        send_batch_size: 500
+        timeout: 10s
+      cumulativetodelta:
+        max_staleness: 3m
+      k8sattributes:
+        extract:
+          annotations:
+            - from: pod
+              key_regex: metadata.dynatrace.com/(.*)
+              tag_name: $$1
+            - from: pod
+              key: metadata.dynatrace.com
+              tag_name: metadata.dynatrace.com
+          metadata:
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.pod.ip
+            - k8s.deployment.name
+            - k8s.replicaset.name
+            - k8s.statefulset.name
+            - k8s.daemonset.name
+            - k8s.job.name
+            - k8s.cronjob.name
+            - k8s.namespace.name
+            - k8s.node.name
+            - k8s.cluster.uid
+            - k8s.container.name
+            - k8s.deployment.uid
+            - k8s.replicaset.uid
+            - k8s.statefulset.uid
+            - k8s.daemonset.uid
+            - k8s.job.uid
+            - k8s.cronjob.uid
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.name
+              - from: resource_attribute
+                name: k8s.namespace.name
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.ip
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.uid
+          - sources:
+              - from: connection
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 75
+        spike_limit_percentage: 15
+      batch:
+        send_batch_size: 10000
+        timeout: 10s
+      transform:
+        metric_statements:
+          - context: metric
+            statements:
+              - convert_summary_quantile_val_to_gauge() where metric.type == METRIC_DATA_TYPE_SUMMARY
+              - extract_count_metric(false) where metric.type == METRIC_DATA_TYPE_SUMMARY
+              - extract_sum_metric(false) where metric.type == METRIC_DATA_TYPE_SUMMARY
+          - context: resource
+            statements:
+              - set(attributes["k8s.workload.name"], attributes["k8s.statefulset.name"]) where
+                IsString(attributes["k8s.statefulset.name"])
+              - set(attributes["k8s.workload.name"], attributes["k8s.replicaset.name"]) where
+                IsString(attributes["k8s.replicaset.name"])
+              - set(attributes["k8s.workload.name"], attributes["k8s.job.name"]) where IsString(attributes["k8s.job.name"])
+              - set(attributes["k8s.workload.name"], attributes["k8s.deployment.name"]) where
+                IsString(attributes["k8s.deployment.name"])
+              - set(attributes["k8s.workload.name"], attributes["k8s.daemonset.name"]) where
+                IsString(attributes["k8s.daemonset.name"])
+              - set(attributes["k8s.workload.name"], attributes["k8s.cronjob.name"]) where
+                IsString(attributes["k8s.cronjob.name"])
+              - set(attributes["k8s.workload.kind"], "statefulset") where IsString(attributes["k8s.statefulset.name"])
+              - set(attributes["k8s.workload.kind"], "replicaset") where IsString(attributes["k8s.replicaset.name"])
+              - set(attributes["k8s.workload.kind"], "job") where IsString(attributes["k8s.job.name"])
+              - set(attributes["k8s.workload.kind"], "deployment") where IsString(attributes["k8s.deployment.name"])
+              - set(attributes["k8s.workload.kind"], "daemonset") where IsString(attributes["k8s.daemonset.name"])
+              - set(attributes["k8s.workload.kind"], "cronjob") where IsString(attributes["k8s.cronjob.name"])
+              - set(attributes["k8s.workload.uid"], attributes["k8s.statefulset.uid"]) where
+                IsString(attributes["k8s.statefulset.uid"])
+              - set(attributes["k8s.workload.uid"], attributes["k8s.replicaset.uid"]) where
+                IsString(attributes["k8s.replicaset.uid"])
+              - set(attributes["k8s.workload.uid"], attributes["k8s.job.uid"]) where IsString(attributes["k8s.job.uid"])
+              - set(attributes["k8s.workload.uid"], attributes["k8s.deployment.uid"]) where
+                IsString(attributes["k8s.deployment.uid"])
+              - set(attributes["k8s.workload.uid"], attributes["k8s.daemonset.uid"]) where
+                IsString(attributes["k8s.daemonset.uid"])
+              - set(attributes["k8s.workload.uid"], attributes["k8s.cronjob.uid"]) where IsString(attributes["k8s.cronjob.uid"])
+              - delete_key(attributes, "k8s.statefulset.name")
+              - delete_key(attributes, "k8s.replicaset.name")
+              - delete_key(attributes, "k8s.job.name")
+              - delete_key(attributes, "k8s.deployment.name")
+              - delete_key(attributes, "k8s.daemonset.name")
+              - delete_key(attributes, "k8s.cronjob.name")
+              - delete_key(attributes, "k8s.statefulset.uid")
+              - delete_key(attributes, "k8s.replicaset.uid")
+              - delete_key(attributes, "k8s.deployment.uid")
+              - delete_key(attributes, "k8s.daemonset.uid")
+              - delete_key(attributes, "k8s.job.uid")
+              - delete_key(attributes, "k8s.cronjob.uid")
+          - context: resource
+            statements:
+              - delete_key(attributes, "service.name")
+              - delete_key(attributes, "service.instance.id")
+              - delete_key(attributes, "processor")
+              - delete_key(attributes, "otel.signal")
+              - delete_key(attributes, "otel.scope.name")
+              - delete_key(attributes, "otel.scope.version")
+          - context: resource
+            statements:
+              - set(attributes["k8s.cluster.name"], "${env:K8S_CLUSTER_NAME}") where attributes["k8s.cluster.name"]
+                == nil and Len("${env:K8S_CLUSTER_NAME}") > 0
+          - context: resource
+            statements:
+              - merge_maps(attributes, ParseJSON(attributes["metadata.dynatrace.com"]), "upsert")
+                where IsMatch(attributes["metadata.dynatrace.com"], "^\\{")
+              - delete_key(attributes, "metadata.dynatrace.com")
+    exporters:
+      debug:
+        verbosity: detailed
+      otlphttp:
+        endpoint: ${env:DT_ENDPOINT}
+        headers:
+          Authorization: Api-Token ${env:DT_OTEL_COLLECTOR_METRICS_INGEST_TOKEN}
+    service:
+      pipelines:
+        metrics:
+          receivers: [prometheus]
+          processors:
+            - memory_limiter
+            - cumulativetodelta
+            - k8sattributes
+            - transform
+            - batch/metrics
+          exporters: [debug, otlphttp]

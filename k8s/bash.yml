@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bash-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bash-app
+  template:
+    metadata:
+      labels:
+        app: bash-app
+    spec:
+      containers:
+        - name: bash-container
+          image: ubuntu:latest # Use an image that has bash installed (e.g., ubuntu, centos, alpine)
+          command: ["/bin/bash", "-c", "tail -f /dev/null"] # Command to keep the container running indefinitely

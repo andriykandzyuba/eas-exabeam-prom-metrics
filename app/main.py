@@ -5,9 +5,16 @@ import threading
 
 # Create a histogram metric to track request latencies
 REQUEST_LATENCY = Histogram(
-    'http_request_duration_seconds_bucket', 
+    'exa_http_request_duration_seconds_bucket',
     'HTTP request duration in seconds',
     buckets=(0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0, float('inf')) # Custom buckets
+)
+
+# Create a histogram metric to track request latencies
+PROCESS_LATENCY = Histogram(
+    'exa_event_processor_latency_buckets',
+    'Some sample latency histogram with custom buckets',
+    buckets=(0.2, 0.4, 1.0, 2.0, 4.0, 16.0, 96.0, float('inf')) # Custom buckets
 )
 
 def generate_observations():
@@ -16,6 +23,7 @@ def generate_observations():
         # simulate a request duration (seconds)
         dur = random.expovariate(1 / 0.1)
         REQUEST_LATENCY.observe(dur)
+        PROCESS_LATENCY.observe(dur)
         time.sleep(random.uniform(0.01, 0.5))
 
 if __name__ == '__main__':
