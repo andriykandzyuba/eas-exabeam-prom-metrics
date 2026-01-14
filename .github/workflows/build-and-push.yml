@@ -1,13 +1,8 @@
 name: Build and Push Image Workflow
 
 on:
-  push:
-    branches:
-      - main
-      - features/*
-    tags:
-      - 'v*.*.*' # Triggers for tags starting with 'v'
-    workflow_dispatch:
+  workflow_dispatch:
+    inputs:
       environment:
         description: 'Select the deployment environment'
         required: true
@@ -17,6 +12,12 @@ on:
           - stage
           - prod
         default: dev
+  push:
+    branches:
+      - main
+      - features/*
+    tags:
+      - 'v*.*.*' # Triggers for tags starting with 'v'
 
 # Required if using OIDC for authentication in 2026
 permissions:
