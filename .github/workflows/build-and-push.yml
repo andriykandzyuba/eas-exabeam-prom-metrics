@@ -19,6 +19,9 @@ on:
     tags:
       - 'v*.*.*' # Triggers for tags starting with 'v'
 
+env:
+  DEPLOY_ENV: ${{ inputs.environment }}
+
 # Required if using OIDC for authentication in 2026
 permissions:
   id-token: write
@@ -29,43 +32,42 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
-      - name: Debug
+      - name: 'Get branch name'
+        if: startsWith(github.ref, 'refs/heads/')
+        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: 'Print Context Info'
         run: |
           echo "Repository: ${{ github.repository }}"
           echo "Ref: ${{ github.ref }}"
           echo "Ref Name: ${{ github.ref_name }}"
           echo "SHA: ${{ github.sha }}"
+          echo "Environment Name: ${{ env.DEPLOY_ENV }}"
+          echo "Branch Name: ${{ env.BRANCH_NAME }}"
 
-      - name: Checkout Code
+      - name: 'Checkout Code'
         uses: actions/checkout@v4
-
-      - name: 'Echo ID token'
-        run: |
-          az version
-          echo "ACTIONS_ID_TOKEN_REQUEST_URL = $ACTIONS_ID_TOKEN_REQUEST_URL"
-          echo "ACTIONS_ID_TOKEN_REQUEST_TOKEN = $ACTIONS_ID_TOKEN_REQUEST_TOKEN"
-          echo "AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}"
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          allow-no-subscriptions: true
 
-      - name: Azure CLI script
+      - name: 'Azure CLI script'
         uses: azure/cli@v2
         with:
           azcliversion: latest
           inlineScript: |
             az account show
 
-      #- name: 'Build and push image'
-      #  uses: azure/docker-login@v1
-      #  with:
-      #    login-server: ${{ env.REGISTRY_LOGIN_SERVER }}
-      #    username: ${{ secrets.REGISTRY_USERNAME }}
-      #    password: ${{ secrets.REGISTRY_PASSWORD }}
-      #- run: |
-      #    docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}:${{ github.sha }}
-      #    docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}:${{ github.sha }}
+      - name: 'Build and push image'
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ vars.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+      - run: |
+          docker build . -t ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}:${{ github.sha }} 
+          docker push ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}:${{ github.sha }}
