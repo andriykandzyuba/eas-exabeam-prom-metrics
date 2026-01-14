@@ -69,6 +69,5 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
-          docker build . -t ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}:${{ github.sha }} \
-            -t ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}:${{ env.BRANCH_NAME }} 
-          docker push ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}:${{ env.BRANCH_NAME }}
+          docker build . -t ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}:${{ github.sha }} 
+          docker push ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}:${{ github.sha }}
