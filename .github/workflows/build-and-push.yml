@@ -2,15 +2,16 @@ name: Build and Push Image Workflow
 
 on:
   workflow_dispatch:
-    environment:
-      description: 'Select the deployment environment'
-      required: true
-      type: choice
-      options:
-        - dev
-        - stage
-        - prod
-      default: dev
+    inputs:
+      environment:
+        description: 'Select the deployment environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - stage
+          - prod
+        default: dev
   push:
     branches:
       - main
