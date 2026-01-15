@@ -1,0 +1,40 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select the deployment environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - stage
+          - prod
+        default: dev
+
+env:
+  DEPLOY_ENV: ${{ inputs.environment }}
+
+# Required if using OIDC for authentication in 2026
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-infra:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: 'Get branch name'
+        if: startsWith(github.ref, 'refs/heads/')
+        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: 'Print Context Info'
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Ref Name: ${{ github.ref_name }}"
+          echo "SHA: ${{ github.sha }}"
+          echo "Environment Name: ${{ env.DEPLOY_ENV }}"
+          echo "Branch Name: ${{ env.BRANCH_NAME }}"

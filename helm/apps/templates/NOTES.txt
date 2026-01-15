@@ -1,0 +1,23 @@
+1. Get the application URL by running these commands:
+{{- if eq .Values.service.type "ClusterIP" }}
+  export POD_NAME=$(kubectl get pods --namespace {{ include "python-web-service.namespace" . }} -l "app={{ include "python-web-service.name" . }}" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace {{ include "python-web-service.namespace" . }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace {{ include "python-web-service.namespace" . }} port-forward $POD_NAME 8080:$CONTAINER_PORT
+{{- else if eq .Values.service.type "NodePort" }}
+  export NODE_PORT=$(kubectl get --namespace {{ include "python-web-service.namespace" . }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "python-web-service.fullname" . }}-service)
+  export NODE_IP=$(kubectl get nodes --namespace {{ include "python-web-service.namespace" . }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- else if eq .Values.service.type "LoadBalancer" }}
+     NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+           You can watch the status by running 'kubectl get --namespace {{ include "python-web-service.namespace" . }} svc -w {{ include "python-web-service.fullname" . }}-service'
+  export SERVICE_IP=$(kubectl get svc --namespace {{ include "python-web-service.namespace" . }} {{ include "python-web-service.fullname" . }}-service --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo http://$SERVICE_IP:{{ .Values.service.port }}
+{{- end }}
+
+2. Access Prometheus metrics at:
+   http://<service-ip>:{{ .Values.container.port }}/metrics
+
+3. OpenTelemetry is configured with:
+   - Metrics Exporter: {{ .Values.env.OTEL_METRICS_EXPORTER }}
+   - Service Name: {{ .Values.env.OTEL_SERVICE_NAME }}
