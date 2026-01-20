@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy Pre-Build Image to K8s
 
 on:
   workflow_dispatch:
