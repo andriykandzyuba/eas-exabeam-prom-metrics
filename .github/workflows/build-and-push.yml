@@ -19,9 +19,6 @@ on:
     tags:
       - 'v*.*.*' # Triggers for tags starting with 'v'
 
-env:
-  DEPLOY_ENV: ${{ inputs.environment || (github.ref_name == 'main' && 'prod' || 'dev') }}
-
 # Required if using OIDC for authentication in 2026
 permissions:
   id-token: write
@@ -30,7 +27,7 @@ permissions:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    environment: ${{ env.DEPLOY_ENV }}
+    environment: ${{ inputs.environment || (github.ref_name == 'main' && 'prod' || 'dev') }}
     steps:
       - name: 'Get branch name'
         if: startsWith(github.ref, 'refs/heads/')
@@ -42,7 +39,6 @@ jobs:
           echo "Ref: ${{ github.ref }}"
           echo "Ref Name: ${{ github.ref_name }}"
           echo "SHA: ${{ github.sha }}"
-          echo "Environment Name: ${{ env.DEPLOY_ENV }}"
           echo "Branch Name: ${{ env.BRANCH_NAME }}"
 
       - name: 'Checkout Code'
