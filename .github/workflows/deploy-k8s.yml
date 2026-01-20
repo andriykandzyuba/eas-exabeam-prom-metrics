@@ -31,30 +31,26 @@ jobs:
       - name: 'Checkout repository'
         uses: actions/checkout@v4
 
-      - name: 'Install and setup Helm'
-        # Use a marketplace action to ensure Helm is installed on the runner
-        uses: azure/setup-helm@v3
+      - name: Set up Helm
+        uses: azure/setup-helm@v3 # Use a GitHub action to install Helm CLI
         with:
-          version: 'v3.12.0' # Specify the desired Helm version
+          version: 'latest' # Installs the latest Helm version
 
       - name: 'Deploy application with Helm'
-        # Use a general-purpose action that can execute helm commands
-        uses: wahyd4/kubectl-helm-action@v2
         env:
           # Pass the base64 encoded kubeconfig secret
           KUBE_CONFIG_DATA: ${{ secrets.KUBECONFIG_BASE64 }}
-        with:
-          args: |
-            helm template k8s helm/k8s \
-            --set secretName=${{ vars.REGISTRY_SECRET_NAME }} \
-            --set environment.name=${{ inputs.environment }} \
-            --set namespace.base=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
-            --set imageCredentials.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
-            --set imageCredentials.username=${{ secrets.REGISTRY_USERNAME }} \
-            --set imageCredentials.password=${{ secrets.REGISTRY_PASSWORD }} \
-            --set imageCredentials.email=${{ vars.REGISTRY_EMAIL }} \
-            --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
-            --dry-run --debug
+        run: |
+          helm template k8s helm/k8s \
+          --set secretName=${{ vars.REGISTRY_SECRET_NAME }} \
+          --set environment.name=${{ inputs.environment }} \
+          --set namespace.base=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --set imageCredentials.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
+          --set imageCredentials.username=${{ secrets.REGISTRY_USERNAME }} \
+          --set imageCredentials.password=${{ secrets.REGISTRY_PASSWORD }} \
+          --set imageCredentials.email=${{ vars.REGISTRY_EMAIL }} \
+          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --dry-run --debug
 
       #- name: 'Verify kubectl access'
       #  uses: actions-hub/kubectl@master
