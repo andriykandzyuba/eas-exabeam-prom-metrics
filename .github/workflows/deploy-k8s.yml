@@ -31,15 +31,9 @@ jobs:
       - name: 'Checkout repository'
         uses: actions/checkout@v4
 
-      - name: 'Set up Kubeconfig'
-        run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > ~/.kube/config
-          chmod 600 ~/.kube/config
-
       - name: 'Verify kubectl access'
         uses: actions-hub/kubectl@master
         env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+          KUBE_CONFIG: ${{ secrets.KUBECONFIG_BASE64 }}
         with:
           args: get pods --all-namespaces
