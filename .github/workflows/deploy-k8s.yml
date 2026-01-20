@@ -22,6 +22,8 @@ jobs:
   deploy-infra:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: 'Print Context Info'
         run: |
@@ -44,22 +46,10 @@ jobs:
           helm template k8s helm/k8s \
           --set secretName=${{ vars.REGISTRY_SECRET_NAME }} \
           --set environment.name=${{ inputs.environment }} \
-          --set namespace.base=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --set namespace.base=${{ vars.K8S_NS_APPS_PREFIX }} \
           --set imageCredentials.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
           --set imageCredentials.username=${{ secrets.REGISTRY_USERNAME }} \
           --set imageCredentials.password=${{ secrets.REGISTRY_PASSWORD }} \
           --set imageCredentials.email=${{ vars.REGISTRY_EMAIL }} \
-          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --namespace ${{ vars.K8S_NS_APPS_PREFIX }} \
           --dry-run --debug
-
-      #- name: 'Verify kubectl access'
-      #  uses: actions-hub/kubectl@master
-      #  env:
-      #    KUBE_CONFIG: ${{ secrets.KUBECONFIG_BASE64 }}
-      #  with:
-      #    args: create secret docker-registry ${{ vars.REGISTRY_SECRET_NAME }}
-      # --docker-server=${{ vars.REGISTRY_LOGIN_SERVER }}
-      # --docker-username=${{ secrets.REGISTRY_USERNAME }}
-      # --docker-password=${{ secrets.REGISTRY_PASSWORD }}
-      # --docker-email=${{ vars.REGISTRY_EMAIL }}
-      # -n ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} --dry-run=server
