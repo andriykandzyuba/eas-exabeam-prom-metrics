@@ -36,4 +36,10 @@ jobs:
         env:
           KUBE_CONFIG: ${{ secrets.KUBECONFIG_BASE64 }}
         with:
-          args: get pods --all-namespaces
+          args: create secret docker-registry ${{ vars.REGISTRY_SECRET_NAME }} \ 
+            --docker-server=${{ vars.REGISTRY_LOGIN_SERVER }} \
+            --docker-username=${{ secrets.REGISTRY_USERNAME }} \
+            --docker-password=${{ secrets.REGISTRY_PASSWORD }} \
+            --docker-email=${{ vars.REGISTRY_EMAIL }} \
+            -n ${{ vars.K8S_NS_APPS_PREFIX }}-${{ env.DEPLOY_ENV }} \
+            --dry-run='none'

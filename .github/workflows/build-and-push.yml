@@ -15,7 +15,6 @@ on:
   push:
     branches:
       - main
-      - features/*
     tags:
       - 'v*.*.*' # Triggers for tags starting with 'v'
 
