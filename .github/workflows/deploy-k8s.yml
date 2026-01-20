@@ -43,9 +43,9 @@ jobs:
           # Pass the base64 encoded kubeconfig secret
           KUBE_CONFIG_DATA: ${{ secrets.KUBECONFIG_BASE64 }}
         run: |
-          helm template k8s helm/k8s \
+          helm install k8s helm/k8s \
           --set secretName=${{ vars.REGISTRY_SECRET_NAME }} \
-          --set namespace=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --set namespace.name=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
           --set imageCredentials.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
           --set imageCredentials.username=${{ secrets.REGISTRY_USERNAME }} \
           --set imageCredentials.password=${{ secrets.REGISTRY_PASSWORD }} \

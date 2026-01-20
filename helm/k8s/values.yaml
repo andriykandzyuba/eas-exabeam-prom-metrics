@@ -4,7 +4,7 @@
 # Namespace configuration
 namespace:
   create: true
-  base: default
+  name: default
   labels:
     name: default
 
