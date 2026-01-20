@@ -1,0 +1,104 @@
+# Default values for python-web-service
+# This is a YAML-formatted file.
+
+# Environment configuration
+environment:
+  name: dev
+
+# Namespace configuration
+namespace:
+  create: true
+  base: default
+  labels:
+    name: default
+
+# Number of replicas
+replicaCount: 1
+
+# Image configuration
+image:
+  repository: localhost
+  name: test/python-web-service
+  tag: "v0.0.3"
+  pullPolicy: IfNotPresent
+
+# Image pull secrets (if needed)
+imagePullSecrets: []
+
+# Service account configuration
+serviceAccount:
+  create: false
+  name: ""
+
+# Pod labels
+podLabels:
+  instrumentation.opentelemetry.io/inject-python: "true"
+
+# Pod annotations for Prometheus scraping
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/metrics"
+  prometheus.io/port: "8000"
+  prometheus.io/scheme: "http"
+
+# Container configuration
+container:
+  name: python-web-service
+  port: 8000
+  portName: http-metrics
+
+# Environment variables
+env:
+  OTEL_METRICS_EXPORTER: "prometheus"
+  OTEL_SERVICE_NAME: "my-python-app"
+
+# Additional environment variables from secrets or configmaps
+envFrom: []
+
+# Resource limits and requests
+resources:
+  limits:
+    cpu: "200m"
+    memory: "256Mi"
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity rules
+affinity: {}
+
+# Security context for the pod
+podSecurityContext: {}
+
+# Security context for the container
+securityContext: {}
+
+# Liveness probe configuration
+livenessProbe:
+  enabled: false
+  httpGet:
+    path: /health
+    port: http-metrics
+  initialDelaySeconds: 30
+  periodSeconds: 10
+
+# Readiness probe configuration
+readinessProbe:
+  enabled: false
+  httpGet:
+    path: /health
+    port: http-metrics
+  initialDelaySeconds: 5
+  periodSeconds: 10
