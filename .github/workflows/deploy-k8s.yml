@@ -45,11 +45,11 @@ jobs:
         run: |
           helm template k8s helm/k8s \
           --set secretName=${{ vars.REGISTRY_SECRET_NAME }} \
-          --set environment.name=${{ inputs.environment }} \
-          --set namespace.base=${{ vars.K8S_NS_APPS_PREFIX }} \
+          --set namespace=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
           --set imageCredentials.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
           --set imageCredentials.username=${{ secrets.REGISTRY_USERNAME }} \
           --set imageCredentials.password=${{ secrets.REGISTRY_PASSWORD }} \
           --set imageCredentials.email=${{ vars.REGISTRY_EMAIL }} \
-          --namespace ${{ vars.K8S_NS_APPS_PREFIX }} \
-          --dry-run --debug
+          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --create-namespace \
+          --debug --dry-run
