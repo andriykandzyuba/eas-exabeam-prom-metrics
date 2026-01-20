@@ -13,9 +13,6 @@ on:
           - prod
         default: dev
 
-env:
-  DEPLOY_ENV: ${{ inputs.environment }}
-
 # Required if using OIDC for authentication in 2026
 permissions:
   id-token: write
@@ -25,8 +22,36 @@ jobs:
   deploy-infra:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: 'Print Context Info'
         run: |
           echo "Environment Name: ${{ env.DEPLOY_ENV }}"
-          echo "Apps Namespace Prefix: ${{ vars.NS_APPS_PREFIX }}"
+          echo "Apps Namespace Prefix: ${{ vars.K8S_NS_APPS_PREFIX }}"
+
+      - name: 'Checkout repository'
+        uses: actions/checkout@v4
+
+      - name: Setup Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3 # Use a GitHub action to install Helm CLI
+        with:
+          version: 'latest' # Installs the latest Helm version
+
+      - name: 'Deploy application with Helm'
+        run: |
+          helm install k8s helm/k8s \
+          --set secretName=${{ vars.REGISTRY_SECRET_NAME }} \
+          --set namespace.name=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --set imageCredentials.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
+          --set imageCredentials.username=${{ secrets.REGISTRY_USERNAME }} \
+          --set imageCredentials.password=${{ secrets.REGISTRY_PASSWORD }} \
+          --set imageCredentials.email=${{ vars.REGISTRY_EMAIL }} \
+          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --create-namespace

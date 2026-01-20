@@ -2,8 +2,8 @@
 Get the namespace
 */}}
 {{- define "k8s.namespace" -}}
-{{- if .Values.namespace.base }}
-{{- printf "%s-%s" .Values.namespace.base .Values.environment.name }}
+{{- if .Values.namespace.name }}
+{{- printf "%s" .Values.namespace.name }}
 {{- else }}
 {{- .Release.Namespace }}
 {{- end }}

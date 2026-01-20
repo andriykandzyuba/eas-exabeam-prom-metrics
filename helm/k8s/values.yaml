@@ -1,14 +1,10 @@
 # Default values for python-web-service
 # This is a YAML-formatted file.
 
-# Environment configuration
-environment:
-  name: dev
-
 # Namespace configuration
 namespace:
   create: true
-  base: default
+  name: default
   labels:
     name: default
 
