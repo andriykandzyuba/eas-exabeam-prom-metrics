@@ -13,9 +13,6 @@ on:
           - prod
         default: dev
 
-env:
-  DEPLOY_ENV: ${{ inputs.environment }}
-
 # Required if using OIDC for authentication in 2026
 permissions:
   id-token: write
@@ -29,4 +26,34 @@ jobs:
       - name: 'Print Context Info'
         run: |
           echo "Environment Name: ${{ env.DEPLOY_ENV }}"
-          echo "Apps Namespace Prefix: ${{ vars.NS_APPS_PREFIX }}"
+          echo "Apps Namespace Prefix: ${{ vars.K8S_NS_APPS_PREFIX }}"
+          echo "K8s Resource Group: ${{ vars.K8S_RG }}"
+          echo "K8s Cluster: ${{ vars.K8S_CLUSTER }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: 'Set AKS context'
+        uses: azure/aks-set-context@v4
+        with:
+          resource-group: ${{ vars.K8S_RG }} # Replace with your resource group name
+          cluster-name: ${{ vars.K8S_CLUSTER }} # Replace with your AKS cluster name
+          # Optional: Use kubelogin for non-admin users/Azure AD authentication
+          # use-kubelogin: true
+
+      - name: 'Install Kubectl'
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest' # Installs the latest version of kubectl
+
+      - name: 'Run kubectl commands'
+        run: |
+          echo "Listing pods in the default namespace:"
+          kubectl get pods --all-namespaces
