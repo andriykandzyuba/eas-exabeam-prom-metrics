@@ -54,5 +54,4 @@ jobs:
           --set imageCredentials.password=${{ secrets.REGISTRY_PASSWORD }} \
           --set imageCredentials.email=${{ vars.REGISTRY_EMAIL }} \
           --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
-          --create-namespace \
-          --debug --dry-run=server
+          --create-namespace
