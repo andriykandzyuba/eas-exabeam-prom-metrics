@@ -27,33 +27,19 @@ jobs:
         run: |
           echo "Environment Name: ${{ env.DEPLOY_ENV }}"
           echo "Apps Namespace Prefix: ${{ vars.K8S_NS_APPS_PREFIX }}"
-          echo "K8s Resource Group: ${{ vars.K8S_RG }}"
-          echo "K8s Cluster: ${{ vars.K8S_CLUSTER }}"
 
-      - name: Checkout repository
+      - name: 'Checkout repository'
         uses: actions/checkout@v4
 
-      - name: 'Login via Azure CLI'
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          allow-no-subscriptions: true
-
-      - name: 'Set AKS context'
-        uses: azure/aks-set-context@v4
-        with:
-          resource-group: ${{ vars.K8S_RG }} # Replace with your resource group name
-          cluster-name: ${{ vars.K8S_CLUSTER }} # Replace with your AKS cluster name
-          # Optional: Use kubelogin for non-admin users/Azure AD authentication
-          # use-kubelogin: true
-
-      - name: 'Install Kubectl'
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'latest' # Installs the latest version of kubectl
-
-      - name: 'Run kubectl commands'
+      - name: 'Set up Kubeconfig'
         run: |
-          echo "Listing pods in the default namespace:"
-          kubectl get pods --all-namespaces
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: 'Verify kubectl access'
+        uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        with:
+          args: get pods --all-namespaces
