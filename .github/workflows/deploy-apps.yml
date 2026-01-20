@@ -12,9 +12,13 @@ on:
           - stage
           - prod
         default: dev
+      sha:
+        description: 'Git SHA to deploy'
+        required: true
 
 env:
   DEPLOY_ENV: ${{ inputs.environment }}
+  IMAGE_FULL_NAME: ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}:${{ inputs.sha }}
 
 # Required if using OIDC for authentication in 2026
 permissions:

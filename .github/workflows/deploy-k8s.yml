@@ -26,15 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
-      - name: 'Get branch name'
-        if: startsWith(github.ref, 'refs/heads/')
-        run: echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
-
       - name: 'Print Context Info'
         run: |
-          echo "Repository: ${{ github.repository }}"
-          echo "Ref: ${{ github.ref }}"
-          echo "Ref Name: ${{ github.ref_name }}"
-          echo "SHA: ${{ github.sha }}"
           echo "Environment Name: ${{ env.DEPLOY_ENV }}"
-          echo "Branch Name: ${{ env.BRANCH_NAME }}"
+          echo "Apps Namespace Prefix: ${{ vars.NS_APPS_PREFIX }}"
