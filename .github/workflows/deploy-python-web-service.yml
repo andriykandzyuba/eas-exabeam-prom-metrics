@@ -1,0 +1,59 @@
+name: Deploy Python Web Service to K8s
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select the deployment environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - stage
+          - prod
+        default: dev
+      sha:
+        description: 'Image Tag'
+        required: true
+
+# Required if using OIDC for authentication in 2026
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-infra:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: 'Print Context Info'
+        run: |
+          echo "Environment Name: ${{ env.DEPLOY_ENV }}"
+          echo "Apps Namespace Prefix: ${{ vars.K8S_NS_APPS_PREFIX }}"
+
+      - name: 'Checkout repository'
+        uses: actions/checkout@v4
+
+      - name: Setup Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3 # Use a GitHub action to install Helm CLI
+        with:
+          version: 'latest' # Installs the latest Helm version
+
+      - name: 'Deploy application with Helm'
+        run: |
+          helm install python-web-service helm/python-web-service \
+          --set "imagePullSecrets[0].name=${{ vars.REGISTRY_SECRET_NAME }}" \ 
+          --set namespace.name=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --set image.repository=${{ vars.REGISTRY_LOGIN_SERVER }} \
+          --set image.name=${{ github.repository }} \
+          --set image.tag=${{ inputs.sha }} \
+          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --dry-run=server --debug

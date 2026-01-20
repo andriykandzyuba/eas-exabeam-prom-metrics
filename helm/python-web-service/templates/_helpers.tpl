@@ -1,4 +1,15 @@
 {{/*
+Get the namespace
+*/}}
+{{- define "python-web-service.namespace" -}}
+{{- if .Values.namespace.name }}
+{{- printf "%s" .Values.namespace.name }}
+{{- else }}
+{{- .Release.Namespace }}
+{{- end }}
+{{- end }}
+
+{{/*
 Expand the name of the chart.
 */}}
 {{- define "python-web-service.name" -}}
@@ -57,16 +68,5 @@ Create the name of the service account to use
 {{- default (include "python-web-service.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
-
-{{/*
-Get the namespace
-*/}}
-{{- define "python-web-service.namespace" -}}
-{{- if .Values.namespace.base }}
-{{- printf "%s-%s" .Values.namespace.base .Values.environment.name }}
-{{- else }}
-{{- .Release.Namespace }}
 {{- end }}
 {{- end }}
