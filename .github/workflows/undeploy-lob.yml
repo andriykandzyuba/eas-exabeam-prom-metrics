@@ -49,4 +49,4 @@ jobs:
 
       - name: 'Undeploy LOB application with Helm'
         run: |
-          helm uninstall python-web-service --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}
+          helm uninstall lob --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}
