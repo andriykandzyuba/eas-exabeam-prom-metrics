@@ -1,4 +1,4 @@
-name: Provision System Resources to K8s
+name: Deploy Python Web Service to K8s
 
 on:
   workflow_dispatch:
@@ -12,6 +12,9 @@ on:
           - stage
           - prod
         default: dev
+      sha:
+        description: 'Image Tag'
+        required: true
 
 # Required if using OIDC for authentication in 2026
 permissions:
@@ -19,7 +22,7 @@ permissions:
   contents: read
 
 jobs:
-  deploy-infra:
+  deploy-lob:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
@@ -33,7 +36,7 @@ jobs:
       - name: 'Checkout repository'
         uses: actions/checkout@v4
 
-      - name: Setup Kubeconfig
+      - name: 'Setup Kubeconfig'
         run: |
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > $HOME/.kube/config
@@ -44,14 +47,17 @@ jobs:
         with:
           version: 'latest' # Installs the latest Helm version
 
-      - name: 'Deploy application with Helm'
+      - name: 'Deploy LOB application with Helm'
         run: |
-          helm install k8s helm/k8s \
-          --set secretName=${{ vars.REGISTRY_SECRET_NAME }} \
+          helm install python-web-service helm/python-web-service \
           --set namespace.name=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
-          --set imageCredentials.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
-          --set imageCredentials.username=${{ secrets.REGISTRY_USERNAME }} \
-          --set imageCredentials.password=${{ secrets.REGISTRY_PASSWORD }} \
-          --set imageCredentials.email=${{ vars.REGISTRY_EMAIL }} \
+          --set secretName=${{ vars.REGISTRY_SECRET_NAME }} \
+          --set containerRegistry.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
+          --set containerRegistry.username=${{ secrets.REGISTRY_USERNAME }} \
+          --set containerRegistry.password=${{ secrets.REGISTRY_PASSWORD }} \
+          --set containerRegistry.email=${{ vars.REGISTRY_EMAIL }} \
+          --set image.repository=${{ vars.REGISTRY_LOGIN_SERVER }} \
+          --set image.name=${{ github.repository }} \
+          --set image.tag=${{ inputs.sha }} \
           --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
           --create-namespace

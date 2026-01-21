@@ -1,19 +1,48 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ include "lob.namespace" . }}
+  labels:
+    {{- toYaml .Values.namespace.labels | nindent 4 }}
+---
+{{- if and .Values.containerRegistry.registry .Values.containerRegistry.username .Values.containerRegistry.password }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Values.secretName }}
+  namespace: {{ include "lob.namespace" . }}
+  labels:
+    {{- include "lob.labels" . | nindent 4 }}
+    {{- with .Values.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: {{ include "lob.dockerconfigjson" . }}
+{{- else }}
+{{- fail "containerRegistry.registry, containerRegistry.username, and containerRegistry.password are required" }}
+{{- end }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "python-web-service.fullname" . }}-deployment
-  namespace: {{ include "python-web-service.namespace" . }}
+  name: {{ include "lob.fullname" . }}-deployment
+  namespace: {{ include "lob.namespace" . }}
   labels:
-    {{- include "python-web-service.labels" . | nindent 4 }}
+    {{- include "lob.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "python-web-service.selectorLabels" . | nindent 6 }}
+      {{- include "lob.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "python-web-service.selectorLabels" . | nindent 8 }}
+        {{- include "lob.selectorLabels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -22,10 +51,8 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
-      {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        - name: {{ .Values.secretName }}
       {{- with .Values.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -80,3 +107,19 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "lob.fullname" . }}-service
+  namespace: {{ include "lob.namespace" . }}
+  labels:
+    {{- include "lob.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+  selector:
+    {{- include "lob.selectorLabels" . | nindent 4 }}

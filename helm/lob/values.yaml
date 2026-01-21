@@ -8,6 +8,28 @@ namespace:
   labels:
     name: default
 
+# Secret name
+secretName: docker-registry-secret
+
+# Additional labels to add to the secret
+labels: {}
+
+# Additional annotations to add to the secret
+annotations: {}
+
+# Docker registry credentials
+# IMPORTANT: For production, use --set flags or external secrets management
+# Do not commit actual credentials to version control!
+containerRegistry:
+  # Registry server URL (e.g., https://index.docker.io/v1/, ghcr.io, <account>.dkr.ecr.<region>.amazonaws.com)
+  registry: ""
+  # Registry username
+  username: ""
+  # Registry password or API key
+  password: ""
+  # Email associated with the registry account
+  email: ""
+
 # Number of replicas
 replicaCount: 1
 
@@ -17,10 +39,7 @@ image:
   name: test/python-web-service
   tag: "v0.0.3"
   pullPolicy: IfNotPresent
-
-# Image pull secrets (if needed)
-imagePullSecrets: []
-
+  
 # Service account configuration
 serviceAccount:
   create: false

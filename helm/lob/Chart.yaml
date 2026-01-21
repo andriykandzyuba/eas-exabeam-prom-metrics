@@ -1,15 +1,19 @@
 apiVersion: v2
-name: k8s
-description: A Helm chart for deploying K8s infra for applications
+name: python-web-service
+description: A Helm chart for Python Web Service with OpenTelemetry and Prometheus metrics
 type: application
 version: 0.1.0
-appVersion: "0.0.1"
+appVersion: "0.1.0"
 keywords:
   - k8s
   - docker
   - registry
   - secret
   - imagePullSecrets
+  - python
+  - web-service
+  - prometheus
+  - opentelemetry
 maintainers:
   - name: Andriy Kandzyuba
     email: andriy.kandzyuba@dynatrace.com
