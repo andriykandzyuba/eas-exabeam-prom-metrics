@@ -12,9 +12,6 @@ on:
           - stage
           - prod
         default: dev
-      sha:
-        description: 'Image Tag'
-        required: true
 
 # Required if using OIDC for authentication in 2026
 permissions:
