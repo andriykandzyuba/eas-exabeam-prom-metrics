@@ -22,7 +22,7 @@ permissions:
   contents: read
 
 jobs:
-  deploy-infra:
+  deploy-lob:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
@@ -36,7 +36,7 @@ jobs:
       - name: 'Checkout repository'
         uses: actions/checkout@v4
 
-      - name: Setup Kubeconfig
+      - name: 'Setup Kubeconfig'
         run: |
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > $HOME/.kube/config
