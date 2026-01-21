@@ -50,7 +50,7 @@ jobs:
       - name: 'Deploy application with Helm'
         run: |
           helm install python-web-service helm/python-web-service \
-          --set "imagePullSecrets[0].name=${{ vars.REGISTRY_SECRET_NAME }}" \ 
+          --set "imagePullSecrets[0].name=${{ vars.REGISTRY_SECRET_NAME }}" \
           --set namespace.name=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
           --set image.repository=${{ vars.REGISTRY_LOGIN_SERVER }} \
           --set image.name=${{ github.repository }} \
