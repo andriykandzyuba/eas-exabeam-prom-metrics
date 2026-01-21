@@ -70,3 +70,15 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Generate the .dockerconfigjson content
+*/}}
+{{- define "python-web-service.dockerconfigjson" -}}
+{{- $registry := .Values.containerRegistry.registry -}}
+{{- $username := .Values.containerRegistry.username -}}
+{{- $password := .Values.containerRegistry.password -}}
+{{- $email := .Values.containerRegistry.email -}}
+{{- $auth := printf "%s:%s" $username $password | b64enc -}}
+{{- printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"auth\":\"%s\"}}}" $registry $username $password $email $auth | b64enc }}
+{{- end }}

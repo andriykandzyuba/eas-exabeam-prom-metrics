@@ -47,12 +47,18 @@ jobs:
         with:
           version: 'latest' # Installs the latest Helm version
 
-      - name: 'Deploy application with Helm'
+      - name: 'Deploy LOB application with Helm'
         run: |
           helm install python-web-service helm/python-web-service \
-          --set "imagePullSecrets[0].name=${{ vars.REGISTRY_SECRET_NAME }}" \
           --set namespace.name=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --set secretName=${{ vars.REGISTRY_SECRET_NAME }} \
+          --set imageCredentials.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
+          --set imageCredentials.username=${{ secrets.REGISTRY_USERNAME }} \
+          --set imageCredentials.password=${{ secrets.REGISTRY_PASSWORD }} \
+          --set imageCredentials.email=${{ vars.REGISTRY_EMAIL }} \
           --set image.repository=${{ vars.REGISTRY_LOGIN_SERVER }} \
           --set image.name=${{ github.repository }} \
           --set image.tag=${{ inputs.sha }} \
-          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}
+          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --create-namespace \
+          --dry-run=server --debug

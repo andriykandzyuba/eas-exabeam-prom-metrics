@@ -3,8 +3,13 @@ name: python-web-service
 description: A Helm chart for Python Web Service with OpenTelemetry and Prometheus metrics
 type: application
 version: 0.1.0
-appVersion: "0.0.3"
+appVersion: "0.1.0"
 keywords:
+  - k8s
+  - docker
+  - registry
+  - secret
+  - imagePullSecrets
   - python
   - web-service
   - prometheus
