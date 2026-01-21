@@ -55,5 +55,4 @@ jobs:
           --set image.repository=${{ vars.REGISTRY_LOGIN_SERVER }} \
           --set image.name=${{ github.repository }} \
           --set image.tag=${{ inputs.sha }} \
-          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
-          --dry-run=server --debug
+          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}
