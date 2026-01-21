@@ -49,7 +49,7 @@ jobs:
 
       - name: 'Deploy LOB application with Helm'
         run: |
-          helm install python-web-service helm/python-web-service \
+          helm install lob helm/lob \
           --set namespace.name=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
           --set secretName=${{ vars.REGISTRY_SECRET_NAME }} \
           --set containerRegistry.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
