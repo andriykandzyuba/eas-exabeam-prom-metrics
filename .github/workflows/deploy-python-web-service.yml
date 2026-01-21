@@ -60,5 +60,4 @@ jobs:
           --set image.name=${{ github.repository }} \
           --set image.tag=${{ inputs.sha }} \
           --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
-          --create-namespace \
-          --dry-run=server --debug
+          --create-namespace
