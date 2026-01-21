@@ -52,10 +52,10 @@ jobs:
           helm install python-web-service helm/python-web-service \
           --set namespace.name=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
           --set secretName=${{ vars.REGISTRY_SECRET_NAME }} \
-          --set imageCredentials.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
-          --set imageCredentials.username=${{ secrets.REGISTRY_USERNAME }} \
-          --set imageCredentials.password=${{ secrets.REGISTRY_PASSWORD }} \
-          --set imageCredentials.email=${{ vars.REGISTRY_EMAIL }} \
+          --set containerRegistry.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
+          --set containerRegistry.username=${{ secrets.REGISTRY_USERNAME }} \
+          --set containerRegistry.password=${{ secrets.REGISTRY_PASSWORD }} \
+          --set containerRegistry.email=${{ vars.REGISTRY_EMAIL }} \
           --set image.repository=${{ vars.REGISTRY_LOGIN_SERVER }} \
           --set image.name=${{ github.repository }} \
           --set image.tag=${{ inputs.sha }} \
