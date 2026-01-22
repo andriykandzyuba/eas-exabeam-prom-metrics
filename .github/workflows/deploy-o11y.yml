@@ -50,6 +50,6 @@ jobs:
           --set namespace.name=${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} \
           --set secret.dtApiToken=${{ secrets.DT_API_TOKEN }} \
           --set config.dtEndpoint=${{ vars.DT_ENDPOINT }} \
-          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} \
           --create-namespace \
           --dry-run=server --debug
