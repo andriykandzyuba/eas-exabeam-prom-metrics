@@ -40,17 +40,6 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 {{- end }}
 ---
-{{- if .Values.namespace.create }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ include "o11y.namespace" . }}
-  annotations:
-    {{- toYaml .Values.namespace.annotations | nindent 4 }}
-  labels:
-    {{- toYaml .Values.namespace.labels | nindent 4 }}
-{{- end }}
----
 {{- if .Values.secret.create }}
 apiVersion: v1
 kind: Secret
