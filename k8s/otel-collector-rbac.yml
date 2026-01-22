@@ -29,3 +29,156 @@ roleRef:
   kind: ClusterRole
   name: otel-collector-cluster-role # Name of the ClusterRole created above
   apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: opentelemetry-collector
+  namespace: opentelemetry-operator
+spec:
+  env:
+    - name: DT_ENDPOINT  # Name used in your application
+      valueFrom:
+        configMapKeyRef:
+          name: opentelemetry-collector-config
+          key: DT_ENDPOINT
+    - name: DT_OTEL_COLLECTOR_METRICS_INGEST_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: LS_TOKEN
+          name: opentelemetry-collector-secret
+  config:
+    receivers:
+      prometheus:
+        config:
+          scrape_configs:
+            - job_name: 'kubernetes-pods'
+              scrape_interval: 5s
+              kubernetes_sd_configs:
+                - role: pod
+                  namespaces:
+                    names:
+                      - dev  # Explicitly include the dev namespace
+              metric_relabel_configs:
+                #- source_labels: [__name__]
+                #  regex: '^.*_bucket.*'
+                #  action: drop
+              relabel_configs:
+                # @ToDo: Enable node filtering if required
+                #- action: keep
+                #  regex: ${env:K8S_NODE_NAME}
+                #  source_labels:
+                #    - __meta_kubernetes_pod_node_name
+    processors:
+      batch/metrics:
+        send_batch_max_size: 5000
+        send_batch_size: 500
+        timeout: 10s
+      cumulativetodelta:
+        max_staleness: 3m
+      k8sattributes:
+        extract:
+          annotations:
+            - from: pod
+              key_regex: metadata.dynatrace.com/(.*)
+              tag_name: $$1
+            - from: pod
+              key: metadata.dynatrace.com
+              tag_name: metadata.dynatrace.com
+          metadata:
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.pod.ip
+            - k8s.deployment.name
+            - k8s.replicaset.name
+            - k8s.statefulset.name
+            - k8s.daemonset.name
+            - k8s.job.name
+            - k8s.cronjob.name
+            - k8s.namespace.name
+            - k8s.node.name
+            - k8s.cluster.uid
+            - k8s.container.name
+            - k8s.deployment.uid
+            - k8s.replicaset.uid
+            - k8s.statefulset.uid
+            - k8s.daemonset.uid
+            - k8s.job.uid
+            - k8s.cronjob.uid
+        pod_association:
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.name
+              - from: resource_attribute
+                name: k8s.namespace.name
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.ip
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.uid
+          - sources:
+              - from: connection
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 75
+        spike_limit_percentage: 15
+      batch:
+        send_batch_size: 10000
+        timeout: 10s
+      transform:
+        metric_statements:
+          - context: metric
+            statements:
+              - convert_summary_quantile_val_to_gauge() where metric.type == METRIC_DATA_TYPE_SUMMARY
+              - extract_count_metric(false) where metric.type == METRIC_DATA_TYPE_SUMMARY
+              - extract_sum_metric(false) where metric.type == METRIC_DATA_TYPE_SUMMARY
+          - context: resource
+            statements:
+              - delete_key(attributes, "k8s.statefulset.name")
+              - delete_key(attributes, "k8s.replicaset.name")
+              - delete_key(attributes, "k8s.job.name")
+              - delete_key(attributes, "k8s.deployment.name")
+              - delete_key(attributes, "k8s.daemonset.name")
+              - delete_key(attributes, "k8s.cronjob.name")
+              - delete_key(attributes, "k8s.statefulset.uid")
+              - delete_key(attributes, "k8s.replicaset.uid")
+              - delete_key(attributes, "k8s.deployment.uid")
+              - delete_key(attributes, "k8s.daemonset.uid")
+              - delete_key(attributes, "k8s.job.uid")
+              - delete_key(attributes, "k8s.cronjob.uid")
+          - context: resource
+            statements:
+              - delete_key(attributes, "service.name")
+              - delete_key(attributes, "service.instance.id")
+              - delete_key(attributes, "processor")
+              - delete_key(attributes, "otel.signal")
+              - delete_key(attributes, "otel.scope.name")
+              - delete_key(attributes, "otel.scope.version")
+          - context: resource
+            statements:
+              - set(attributes["k8s.cluster.name"], "${env:K8S_CLUSTER_NAME}") where attributes["k8s.cluster.name"]
+                == nil and Len("${env:K8S_CLUSTER_NAME}") > 0
+          - context: resource
+            statements:
+              - merge_maps(attributes, ParseJSON(attributes["metadata.dynatrace.com"]), "upsert")
+                where IsMatch(attributes["metadata.dynatrace.com"], "^\\{")
+              - delete_key(attributes, "metadata.dynatrace.com")
+    exporters:
+      debug:
+        verbosity: detailed
+      otlphttp:
+        endpoint: ${env:DT_ENDPOINT}
+        headers:
+          Authorization: Api-Token ${env:DT_OTEL_COLLECTOR_METRICS_INGEST_TOKEN}
+    service:
+      pipelines:
+        metrics:
+          receivers: [prometheus]
+          processors:
+            - memory_limiter
+            - cumulativetodelta
+            - k8sattributes
+            - transform
+            - batch/metrics
+          exporters: [debug, otlphttp]

@@ -1,0 +1,22 @@
+OpenTelemetry Collector RBAC has been configured.
+
+{{- if .Values.clusterRole.create }}
+ClusterRole: {{ .Values.clusterRole.name }}
+{{- end }}
+
+{{- if .Values.clusterRoleBinding.create }}
+ClusterRoleBinding: {{ .Values.clusterRoleBinding.name }}
+{{- end }}
+
+ServiceAccount: {{ .Values.serviceAccount.name }} (namespace: {{ .Values.serviceAccount.namespace }})
+
+The ClusterRole grants the following permissions:
+- API Groups: "", apps, batch
+- Resources: pods, namespaces, nodes, services, replicasets, deployments, daemonsets, statefulsets, jobs, cronjobs
+- Verbs: get, list, watch
+
+To verify the RBAC configuration:
+
+  kubectl get clusterrole {{ .Values.clusterRole.name }}
+  kubectl get clusterrolebinding {{ .Values.clusterRoleBinding.name }}
+  kubectl describe clusterrolebinding {{ .Values.clusterRoleBinding.name }}
