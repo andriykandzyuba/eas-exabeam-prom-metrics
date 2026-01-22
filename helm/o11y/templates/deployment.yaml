@@ -266,7 +266,7 @@ spec:
       otlphttp:
         endpoint: ${env:DT_ENDPOINT}
         headers:
-          Authorization: Api-Token ${env:DT_OTEL_COLLECTOR_METRICS_INGEST_TOKEN}
+          Authorization: Api-Token ${env:DT_ENDPOINT}
     service:
       pipelines:
         metrics:
