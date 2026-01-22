@@ -51,5 +51,6 @@ jobs:
           --set secret.dtApiToken=${{ secrets.DT_API_TOKEN }} \
           --set config.dtEndpoint=${{ vars.DT_ENDPOINT }} \
           --set "prometheus.namespaces[0]=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}" \
+          --set serviceAccount.name=${{ vars.K8S_NS_O11Y_PREFIX }}-collector \
           --namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} \
-          --create-namespace
+          --create-namespace --dry-run=server --debug
