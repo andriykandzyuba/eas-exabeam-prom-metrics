@@ -50,7 +50,7 @@ metadata:
     {{- include "o11y.labels" . | nindent 4 }}
 type: Opaque
 data:
-  DT_API_TOKEN: {{ .Values.secret.dtApiToken | b64enc | quote }}
+  DT_API_TOKEN: {{ .Values.secret.dtApiToken }}
 {{- end }}
 ---
 {{- if .Values.configMap.create }}
