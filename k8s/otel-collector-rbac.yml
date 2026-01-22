@@ -42,10 +42,10 @@ spec:
         configMapKeyRef:
           name: opentelemetry-collector-config
           key: DT_ENDPOINT
-    - name: DT_OTEL_COLLECTOR_METRICS_INGEST_TOKEN
+    - name: DT_API_TOKEN
       valueFrom:
         secretKeyRef:
-          key: LS_TOKEN
+          key: DT_API_TOKEN
           name: opentelemetry-collector-secret
   config:
     receivers:
@@ -170,7 +170,7 @@ spec:
       otlphttp:
         endpoint: ${env:DT_ENDPOINT}
         headers:
-          Authorization: Api-Token ${env:DT_OTEL_COLLECTOR_METRICS_INGEST_TOKEN}
+          Authorization: Api-Token ${env:DT_API_TOKEN}
     service:
       pipelines:
         metrics:
