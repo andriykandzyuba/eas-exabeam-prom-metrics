@@ -49,3 +49,10 @@ Create chart name and version as used by the chart label.
 {{- define "o11y.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
+
+{{/*
+ServiceAccount Name as a Chart Name + "-collector"
+*/}}
+{{- define "o11y.serviceAccountName" -}}
+{{- printf "%s-collector" (include "o11y.collectorName" .) | trunc 63 | trimSuffix "-" }}
+{{- end }}
