@@ -99,4 +99,4 @@ clusterRoleBinding:
 # ServiceAccount configuration
 serviceAccount:
   # Name of the ServiceAccount (created by OpenTelemetry Operator)
-  name: opentelemetry-collector-service-account
+  name: o11y-collector
