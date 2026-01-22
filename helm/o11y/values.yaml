@@ -6,6 +6,9 @@ namespace:
   name: o11y
   labels:
     name: default
+  annotations:
+    meta.helm.sh/release-name: o11y
+    meta.helm.sh/release-namespace: dt-o11y-dev
 
 # Collector name
 collectorName: opentelemetry-collector
