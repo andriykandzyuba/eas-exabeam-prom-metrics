@@ -52,4 +52,4 @@ jobs:
           --set config.dtEndpoint=${{ vars.DT_ENDPOINT }} \
           --set "prometheus.namespaces[0]=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}" \
           --namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} \
-          --create-namespace --dry-run=server --debug
+          --create-namespace
