@@ -33,7 +33,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: {{ .Values.serviceAccount.name }}
-    namespace: {{ .Values.o11y.namespace }}
+    namespace: {{ include "o11y.namespace" . }}
 roleRef:
   kind: ClusterRole
   name: {{ .Values.clusterRole.name }}
