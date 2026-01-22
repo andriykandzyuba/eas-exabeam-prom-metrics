@@ -1,0 +1,102 @@
+# Default values for otel-collector
+
+# Namespace for the collector (also used for ConfigMap, Secret)
+namespace:
+  create: true
+  name: o11y
+  labels:
+    name: default
+
+# Collector name
+collectorName: opentelemetry-collector
+
+# Environment variables from ConfigMap
+config:
+  # Dynatrace endpoint URL
+  dtEndpoint: ""
+
+# Secret configuration
+secret:
+  create: true
+  name: opentelemetry-collector-secret
+  # Dynatrace API token for metrics ingest
+  # IMPORTANT: For production, use --set or external secrets management
+  dtApiToken: ""
+
+# ConfigMap configuration
+configMap:
+  create: true
+  name: opentelemetry-collector-config
+
+# Prometheus scrape configuration
+prometheus:
+  scrapeInterval: 5s
+  # Namespaces to scrape
+  namespaces:
+    - dev
+
+# Processors configuration
+processors:
+  batch:
+    sendBatchSize: 10000
+    timeout: 10s
+  batchMetrics:
+    sendBatchMaxSize: 5000
+    sendBatchSize: 500
+    timeout: 10s
+  cumulativeToDelta:
+    maxStaleness: 3m
+  memoryLimiter:
+    checkInterval: 1s
+    limitPercentage: 75
+    spikeLimitPercentage: 15
+
+# K8s cluster name (optional)
+k8sClusterName: ""
+
+# Exporters configuration
+exporters:
+  debug:
+    enabled: true
+    verbosity: detailed
+  otlphttp:
+    enabled: true
+
+# ClusterRole configuration
+clusterRole:
+  create: true
+  name: otel-collector-cluster-role
+  labels: {}
+  annotations: {}
+  rules:
+    - apiGroups:
+        - ""
+        - apps
+        - batch
+      resources:
+        - pods
+        - namespaces
+        - nodes
+        - services
+        - replicasets
+        - deployments
+        - daemonsets
+        - statefulsets
+        - jobs
+        - cronjobs
+      verbs:
+        - get
+        - list
+        - watch
+
+# ClusterRoleBinding configuration
+clusterRoleBinding:
+  create: true
+  name: otel-collector-cluster-role-binding
+  labels: {}
+  annotations: {}
+
+# ServiceAccount configuration
+serviceAccount:
+  # Name of the ServiceAccount (created by OpenTelemetry Operator)
+  name: opentelemetry-collector-service-account
