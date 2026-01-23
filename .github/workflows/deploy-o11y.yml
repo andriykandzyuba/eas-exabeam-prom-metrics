@@ -53,7 +53,7 @@ jobs:
           --set admissionWebhooks.certManager.enabled=false \
           --set admissionWebhooks.autoGenerateCert.enabled=true \
           --namespace=${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} \
-          --create-namespace
+          --create-namespace --wait --timeout 5m
 
       - name: 'Deploy OpenTelemetry Collector'
         run: |
