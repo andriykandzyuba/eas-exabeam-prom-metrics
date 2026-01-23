@@ -39,14 +39,22 @@ jobs:
           echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
 
-      - name: Set up Helm
+      - name: 'Set up Helm'
         uses: azure/setup-helm@v3 # Use a GitHub action to install Helm CLI
         with:
           version: 'latest' # Installs the latest Helm version
 
+      - name: 'Deploy OpenTelemetry Operator'
+        run: |
+          helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
+          helm repo update
+          helm install ${{ vars.HELM_O11Y_OPR_REPO }} open-telemetry/opentelemetry-operator \
+          --namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} \
+          --create-namespace
+
       - name: 'Deploy LOB application with Helm'
         run: |
-          helm install o11y helm/o11y \
+          helm install ${{ vars.HELM_O11Y_REPO }} helm/o11y \
           --set namespace.name=${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} \
           --set secret.dtApiToken=${{ secrets.DT_API_TOKEN }} \
           --set config.dtEndpoint=${{ vars.DT_ENDPOINT }} \
