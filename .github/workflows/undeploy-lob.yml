@@ -46,7 +46,9 @@ jobs:
 
       - name: 'Undeploy LOB application with Helm'
         run: |
-          helm uninstall ${{ vars.HELM_LOB_REPO }} --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}
+          helm uninstall ${{ vars.HELM_LOB_REPO }} \
+          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --ignore-not-found
 
       - uses: actions-hub/kubectl@master
         env:
