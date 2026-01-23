@@ -1,4 +1,4 @@
-name: Undeploy Python Web Service from K8s
+name: Undeploy OpenTelemetry Collector from K8s
 
 on:
   workflow_dispatch:
@@ -44,12 +44,16 @@ jobs:
         with:
           version: 'latest' # Installs the latest Helm version
 
-      - name: 'Undeploy LOB application with Helm'
+      - name: 'Undeploy o11y application with Helm'
         run: |
-          helm uninstall ${{ vars.HELM_LOB_REPO }} --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}
+          helm uninstall ${{ vars.HELM_O11Y_REPO }} --namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }}
+
+      - name: 'Undeploy OpenTelemetry Operator application with Helm'
+        run: |
+          helm uninstall ${{ vars.HELM_O11Y_OPR_REPO }} --namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }}
 
       - uses: actions-hub/kubectl@master
         env:
           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
         with:
-          args: delete namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} --ignore-not-found
+          args: delete namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} --ignore-not-found
