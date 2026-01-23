@@ -46,14 +46,18 @@ jobs:
 
       - name: 'Undeploy o11y application with Helm'
         run: |
-          helm uninstall ${{ vars.HELM_O11Y_REPO }} --namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }}
+          helm uninstall ${{ vars.HELM_OTEL_REPO }} \
+          --namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} \
+          --ignore-not-found
 
       - name: 'Undeploy OpenTelemetry Operator application with Helm'
         run: |
-          helm uninstall ${{ vars.HELM_O11Y_OPR_REPO }} --namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }}
+          helm uninstall ${{ vars.HELM_OTEL_OPR_REPO }} \
+          --namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} \
+          --ignore-not-found
 
       - uses: actions-hub/kubectl@master
         env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+          KUBE_CONFIG: ${{ secrets.KUBECONFIG_BASE64 }}
         with:
           args: delete namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} --ignore-not-found
