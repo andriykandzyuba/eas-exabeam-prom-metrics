@@ -54,6 +54,6 @@ jobs:
 
       - uses: actions-hub/kubectl@master
         env:
-          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+          KUBE_CONFIG: ${{ secrets.KUBECONFIG_BASE64 }}
         with:
           args: delete namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} --ignore-not-found
