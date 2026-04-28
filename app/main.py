@@ -3,6 +3,18 @@ import time
 import random
 import threading
 
+import logging
+import sys
+
+# Setup logging system
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
+logger = logging.getLogger(__name__)
+logger.info("Application started in AKS")
+
 # Create a histogram metric to track request latencies
 REQUEST_LATENCY = Histogram(
     'exa_http_request_duration_seconds_bucket',
@@ -29,11 +41,12 @@ def generate_observations():
 if __name__ == '__main__':
     # Expose metrics on port 8000
     start_http_server(8000)
+    logger.info('Starting Prometheus metrics generation prob')
     t = threading.Thread(target=generate_observations, daemon=True)
     t.start()
-    print('Metrics available at http://0.0.0.0:8000/metrics')
+    logger.info('Metrics available at http://0.0.0.0:8000/metrics')
     try:
         while True:
             time.sleep(10)
     except KeyboardInterrupt:
-        print('Shutting down')
+        logger.info('Shutting down')
