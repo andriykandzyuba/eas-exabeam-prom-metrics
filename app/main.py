@@ -29,6 +29,7 @@ def generate_observations():
 if __name__ == '__main__':
     # Expose metrics on port 8000
     start_http_server(8000)
+    print('Starting Prometheus metrics generation prob')
     t = threading.Thread(target=generate_observations, daemon=True)
     t.start()
     print('Metrics available at http://0.0.0.0:8000/metrics')
