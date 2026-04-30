@@ -49,6 +49,11 @@ serviceAccount:
 podLabels:
   instrumentation.opentelemetry.io/inject-python: "true"
 
+# Environment variables
+env:
+  OTEL_METRICS_EXPORTER: "prometheus"
+  OTEL_SERVICE_NAME: &otelServiceName "python-web-service"
+
 # Pod annotations for Prometheus scraping
 podAnnotations:
   prometheus.io/scrape: "true"
@@ -57,18 +62,13 @@ podAnnotations:
   prometheus.io/scheme: "http"
   # Dynatrace OneAgent annotations (optional, only if using Dynatrace OneAgent for monitoring)
   metadata.dynatrace.com/k8s.namespace.label.domain: sandbox
-  metadata.dynatrace.com/k8s.namespace.label.otel.service.name: {{ .Values.env.OTEL_SERVICE_NAME }}
+  metadata.dynatrace.com/k8s.namespace.label.otel.service.name: *otelServiceName
 
 # Container configuration
 container:
   name: python-web-service
   port: 8000
   portName: http-metrics
-
-# Environment variables
-env:
-  OTEL_METRICS_EXPORTER: "prometheus"
-  OTEL_SERVICE_NAME: "python-web-service"
 
 # Additional environment variables from secrets or configmaps
 envFrom: []
