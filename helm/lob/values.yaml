@@ -57,6 +57,7 @@ podAnnotations:
   prometheus.io/scheme: "http"
   # Dynatrace OneAgent annotations (optional, only if using Dynatrace OneAgent for monitoring)
   metadata.dynatrace.com/k8s.namespace.label.domain: sandbox
+  metadata.dynatrace.com/k8s.namespace.label.otel.service.name: {{ .Values.env.OTEL_SERVICE_NAME }}
 
 # Container configuration
 container:
