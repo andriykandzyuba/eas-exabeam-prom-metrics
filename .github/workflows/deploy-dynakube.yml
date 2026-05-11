@@ -45,14 +45,19 @@ jobs:
 
       - name: 'Deploy Dynatrace Operator with Helm'
         run: |
-          helm install dynatrace-operator oci://public.ecr.aws/dynatrace/dynatrace-operator \
+          helm upgrade --install dynatrace-operator oci://public.ecr.aws/dynatrace/dynatrace-operator \
           --create-namespace \
           --namespace dynatrace \
           --rollback-on-failure
 
+      # Explicitly wait for the deployment rollout to confirm readiness
+      - name: 'Wait for DynaKube Operator Readiness'
+        run: |
+          kubectl rollout status deployment/dynatrace-operator -n dynatrace --timeout=300s
+
       - name: 'Deploy DynaKube OneAgent with Helm'
         run: |
-          helm install dynatrace-oneagent helm/oneagent \
+          helm upgrade --install dynatrace-oneagent helm/oneagent \
           --set apiUrl=https://${{ vars.DT_ENVIRONMENT_ID }}.live.dynatrace.com/api \
           --set secret.apiToken=$(echo -n ${{ vars.DT_DYNAKUBE_API_TOKEN_BASE64 }} | base64) \
           --set secret.dataIngestToken=$(echo -n ${{ secrets.DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64 }} | base64) \
