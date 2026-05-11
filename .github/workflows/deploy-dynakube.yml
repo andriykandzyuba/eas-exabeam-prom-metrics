@@ -57,8 +57,8 @@ jobs:
 
       - name: 'Encode Dynatrace API Token and Data Ingest Token as Base64 and Set as Environment Variables'
         run: |
-          echo "DT_DYNAKUBE_API_TOKEN_BASE64=$( echo -n ${{ secrets.DT_DYNAKUBE_API_TOKEN }} | base64 )" >> $GITHUB_ENV
-          echo "DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64=$( echo -n ${{ secrets.DT_DYNAKUBE_DATA_INGEST_TOKEN }} | base64 )" >> $GITHUB_ENV
+          echo "DT_DYNAKUBE_API_TOKEN_BASE64=$( echo -n "${{ secrets.DT_DYNAKUBE_API_TOKEN }}" | base64 -w 0 )" >> $GITHUB_ENV
+          echo "DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64=$( echo -n "${{ secrets.DT_DYNAKUBE_DATA_INGEST_TOKEN }}" | base64 -w 0 )" >> $GITHUB_ENV
 
       - name: 'Deploy DynaKube OneAgent with Helm'
         run: |
