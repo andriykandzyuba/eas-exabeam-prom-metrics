@@ -68,5 +68,4 @@ jobs:
           --set secret.dataIngestToken=$DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64 \
           --namespace dynatrace \
           --create-namespace \
-          --rollback-on-failure \
-          --dry-run --debug
+          --rollback-on-failure
