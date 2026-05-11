@@ -1,0 +1,43 @@
+{{- if .Values.secret.create }}
+apiVersion: v1
+data:
+  apiToken: {{ .Values.secret.apiToken }}
+  dataIngestToken: {{ .Values.secret.dataIngestToken }}
+kind: Secret
+metadata:
+  name: {{ .Values.secret.name }}
+  namespace: {{ include "oneagent.namespace" . }}
+  labels:
+    {{- include "oneagent.labels" . | nindent 4 }}
+type: Opaque
+{{- end }}
+---
+apiVersion: dynatrace.com/v1beta6
+kind: DynaKube
+metadata:
+  name: {{ .Values.dynakubeName }}
+  namespace: {{ include "oneagent.namespace" . }}
+  labels:
+    {{- include "oneagent.labels" . | nindent 4 }}
+spec:
+  apiUrl: {{ required "apiUrl is required" .Values.apiUrl }}
+  skipCertCheck: {{ .Values.skipCertCheck }}
+
+  metadataEnrichment:
+    enabled: {{ .Values.metadataEnrichment.enabled }}
+
+  oneAgent:
+    cloudNativeFullStack:
+      {{- with .Values.oneAgent.cloudNativeFullStack.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+  activeGate:
+    capabilities:
+      {{- toYaml .Values.activeGate.capabilities | nindent 6 }}
+    resources:
+      {{- toYaml .Values.activeGate.resources | nindent 6 }}
+
+  logMonitoring:
+    {{- toYaml .Values.logMonitoring | nindent 4 }}

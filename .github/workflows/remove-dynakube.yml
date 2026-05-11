@@ -43,9 +43,11 @@ jobs:
         with:
           version: 'latest' # Installs the latest Helm version
 
-      #- name: 'Remove DynaKube custom resource'
-      #  run: |
-      #    kubectl delete -f k8s/dynakube.yaml --ignore-not-found
+      - name: 'Uninstall DynaKube OneAgent with Helm'
+        run: |
+          helm uninstall ${{ vars.HELM_DYNAKUBE_REPO }} \
+          --namespace dynatrace \
+          --ignore-not-found
 
       - name: 'Uninstall Dynatrace Operator with Helm'
         run: |

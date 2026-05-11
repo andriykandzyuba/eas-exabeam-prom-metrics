@@ -1,0 +1,14 @@
+apiVersion: v2
+name: oneagent
+description: A Helm chart for Dynatrace DynaKube OneAgent deployment
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - dynatrace
+  - dynakube
+  - oneagent
+  - monitoring
+maintainers:
+  - name: Andriy Kandzyuba
+    email: andriy.kandzyuba@dynatrace.com

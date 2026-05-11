@@ -50,6 +50,11 @@ jobs:
           --namespace dynatrace \
           --rollback-on-failure
 
-      #- name: 'Apply DynaKube custom resource'
-      #  run: |
-      #   kubectl apply -f k8s/dynakube.yaml
+      - name: 'Deploy DynaKube OneAgent with Helm'
+        run: |
+          helm install ${{ vars.HELM_DYNAKUBE_REPO }} helm/oneagent \
+          --set apiUrl=https://${{ vars.DT_ENVIRONMENT_ID }}.live.dynatrace.com/api \
+          --set secret.apiToken=${{ secrets.DT_DYNAKUBE_API_TOKEN }} \
+          --set secret.dataIngestToken=${{ secrets.DT_DYNAKUBE_DATA_INGEST_TOKEN }} \
+          --namespace dynatrace \
+          --create-namespace
