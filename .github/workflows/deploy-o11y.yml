@@ -59,8 +59,8 @@ jobs:
         run: |
           helm install ${{ vars.HELM_OTEL_REPO }} helm/o11y \
           --set namespace.name=${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} \
-          --set secret.dtApiToken=${{ secrets.DT_DYNAKUBE_DATA_INGEST_TOKEN }} \
-          --set config.dtEndpoint=https://${{ vars.DT_API_TOKEN }}.live.dynatrace.com/api/v2/otlp \
+          --set secret.dtApiToken=${{ secrets.DT_API_TOKEN }} \
+          --set config.dtEndpoint=https://${{ vars.DT_ENVIRONMENT_ID }}.live.dynatrace.com/api/v2/otlp \
           --set "prometheus.namespaces[0]=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}" \
           --namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} \
           --create-namespace
