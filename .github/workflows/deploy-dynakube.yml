@@ -1,0 +1,55 @@
+name: Deploy Dynatrace DynaKube Operator to K8s
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select the deployment environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - stage
+          - prod
+        default: dev
+
+# Required if using OIDC for authentication in 2026
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-dynakube:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: 'Print Context Info'
+        run: |
+          echo "Environment Name: ${{ inputs.environment }}"
+
+      - name: 'Checkout repository'
+        uses: actions/checkout@v4
+
+      - name: 'Setup Kubeconfig'
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 --decode > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: 'Set up Helm'
+        uses: azure/setup-helm@v3 # Use a GitHub action to install Helm CLI
+        with:
+          version: 'latest' # Installs the latest Helm version
+
+      - name: 'Deploy Dynatrace Operator with Helm'
+        run: |
+          helm install dynatrace-operator oci://public.ecr.aws/dynatrace/dynatrace-operator \
+          --create-namespace \
+          --namespace dynatrace \
+          --rollback-on-failure
+
+      #- name: 'Apply DynaKube custom resource'
+      #  run: |
+      #   kubectl apply -f k8s/dynakube.yaml
