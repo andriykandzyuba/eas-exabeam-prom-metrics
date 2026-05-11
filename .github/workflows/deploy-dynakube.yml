@@ -59,8 +59,8 @@ jobs:
         run: |
           helm upgrade --install dynatrace-oneagent helm/oneagent \
           --set apiUrl=https://${{ vars.DT_ENVIRONMENT_ID }}.live.dynatrace.com/api \
-          --set secret.apiToken=$(echo -n ${{ vars.DT_DYNAKUBE_API_TOKEN_BASE64 }} | base64) \
-          --set secret.dataIngestToken=$(echo -n ${{ secrets.DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64 }} | base64) \
+          --set secret.apiToken=${{ secrets.DT_DYNAKUBE_API_TOKEN_BASE64 }} \
+          --set secret.dataIngestToken=${{ secrets.DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64 }} \
           --namespace dynatrace \
           --create-namespace \
           --rollback-on-failure \
