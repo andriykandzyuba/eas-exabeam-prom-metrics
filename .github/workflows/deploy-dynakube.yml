@@ -52,10 +52,12 @@ jobs:
 
       - name: 'Deploy DynaKube OneAgent with Helm'
         run: |
+          DT_DYNAKUBE_API_TOKEN_BASE64 = $(echo -n ${{ vars.DT_ENVIRONMENT_ID }} | base64)
+          DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64 = $(echo -n ${{ secrets.DT_DYNAKUBE_DATA_INGEST_TOKEN }} | base64)
           helm install dynatrace-oneagent helm/oneagent \
           --set apiUrl=https://${{ vars.DT_ENVIRONMENT_ID }}.live.dynatrace.com/api \
-          --set secret.apiToken=${{ secrets.DT_DYNAKUBE_API_TOKEN }} \
-          --set secret.dataIngestToken=${{ secrets.DT_DYNAKUBE_DATA_INGEST_TOKEN }} \
+          --set secret.apiToken=$DT_DYNAKUBE_API_TOKEN_BASE64 \
+          --set secret.dataIngestToken=$DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64 \
           --namespace dynatrace \
           --create-namespace \
           --rollback-on-failure
