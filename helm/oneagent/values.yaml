@@ -1,0 +1,61 @@
+# Default values for Dynatrace DynaKube OneAgent
+
+# Namespace for the DynaKube resources
+namespace:
+  create: true
+  name: dynatrace
+
+# Dynatrace API URL including the `/api` path at the end
+# For SaaS, set ENVIRONMENTID to your environment ID
+# Example: https://ENVIRONMENTID.live.dynatrace.com/api
+apiUrl: ""
+
+# Secret configuration for Dynatrace tokens
+secret:
+  create: true
+  name: dynakube
+  # IMPORTANT: For production, use --set or external secrets management
+  apiToken: ""
+  dataIngestToken: ""
+
+# DynaKube custom resource name
+dynakubeName: dynakube
+
+# Optional: Disable certificate validation checks for installer download and API communication
+skipCertCheck: false
+
+# Configuration for Metadata Enrichment
+metadataEnrichment:
+  enabled: true
+
+# Configuration for OneAgent instances
+oneAgent:
+  # Enables cloud-native fullstack monitoring
+  cloudNativeFullStack:
+    tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+
+# Configuration for ActiveGate instances
+activeGate:
+  # Specifies which capabilities will be enabled on ActiveGate instances
+  capabilities:
+    - routing
+    - kubernetes-monitoring
+    - dynatrace-api
+
+  # Resource settings for ActiveGate instances
+  resources:
+    requests:
+      cpu: 500m
+      memory: 6Gi
+    limits:
+      cpu: 1000m
+      memory: 6Gi
+
+# Optional: Enables and controls log-monitoring
+logMonitoring: {}
