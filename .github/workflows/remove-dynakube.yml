@@ -45,7 +45,7 @@ jobs:
 
       - name: 'Uninstall DynaKube OneAgent with Helm'
         run: |
-          helm uninstall ${{ vars.HELM_DYNAKUBE_REPO }} \
+          helm uninstall dynatrace-oneagent \
           --namespace dynatrace \
           --ignore-not-found
 
