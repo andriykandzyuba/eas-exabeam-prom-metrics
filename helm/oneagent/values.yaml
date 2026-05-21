@@ -31,6 +31,8 @@ metadataEnrichment:
 # Configuration for OneAgent instances
 oneAgent:
   # Enables cloud-native fullstack monitoring
+  hostGroup: integration-probs
+
   cloudNativeFullStack:
     tolerations:
       - effect: NoSchedule
