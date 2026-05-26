@@ -43,6 +43,7 @@ spec:
     metadata:
       labels:
         {{- include "lob.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/instance: {{ include "lob.fullname" . }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -58,13 +59,15 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ .Values.container.name }}
+        - name: {{ include "lob.fullname" . }}
           image: "{{ .Values.image.repository }}/{{.Values.image.name}}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.container.port }}
               name: {{ .Values.container.portName }}
           env:
+            - name: OTEL_SERVICE_NAME
+              value: {{ include "lob.fullname" . | quote }}
             {{- range $key, $value := .Values.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}

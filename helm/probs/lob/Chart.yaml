@@ -1,6 +1,6 @@
 apiVersion: v2
-name: python-web-service
-description: A Helm chart for Python Web Service with OpenTelemetry and Prometheus metrics
+name: lob-app
+description: A generic Helm chart for LOB applications
 type: application
 version: 0.1.0
 appVersion: "0.1.0"
