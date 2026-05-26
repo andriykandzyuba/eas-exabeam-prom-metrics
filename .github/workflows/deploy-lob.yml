@@ -12,6 +12,13 @@ on:
           - stage
           - prod
         default: dev
+      app:
+        description: 'Select the application to deploy'
+        required: true
+        type: choice
+        options:
+          - python
+        default: python
       sha:
         description: 'Image Tag'
         required: true
@@ -57,7 +64,7 @@ jobs:
           --set containerRegistry.password=${{ secrets.REGISTRY_PASSWORD }} \
           --set containerRegistry.email=${{ vars.REGISTRY_EMAIL }} \
           --set image.repository=${{ vars.REGISTRY_LOGIN_SERVER }} \
-          --set image.name=${{ github.repository }} \
+          --set image.name=${{ github.repository }}-${{ input.app }} \
           --set image.tag=${{ inputs.sha }} \
           --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
           --create-namespace
