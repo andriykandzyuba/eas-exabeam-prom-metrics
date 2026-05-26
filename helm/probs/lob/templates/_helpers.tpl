@@ -51,7 +51,7 @@ Selector labels
 */}}
 {{- define "lob.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "lob.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ include "lob.fullname" . }}
 app: {{ include "lob.name" . }}
 {{- end }}
 

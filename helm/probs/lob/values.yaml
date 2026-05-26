@@ -1,10 +1,6 @@
 # Default values for lob-app
 # This is a YAML-formatted file.
 
-# Environment and Application name
-environment: dev
-app: python
-
 # Namespace configuration
 namespace:
   create: true
