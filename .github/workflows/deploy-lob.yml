@@ -69,6 +69,5 @@ jobs:
           --set image.repository=${{ vars.REGISTRY_LOGIN_SERVER }} \
           --set image.name=${{ github.repository }}-${{ inputs.app }} \
           --set image.tag=${{ inputs.sha }} \
-          --set podLabels."instrumentation\.opentelemetry\.io/inject-${{ inputs.app }}"="true" \
           --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}-${{ inputs.app }} \
           --create-namespace
