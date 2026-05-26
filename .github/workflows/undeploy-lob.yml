@@ -1,4 +1,4 @@
-name: Undeploy Python Web Service from K8s
+name: Undeploy Lob App from K8s
 
 on:
   workflow_dispatch:
@@ -12,6 +12,13 @@ on:
           - stage
           - prod
         default: dev
+      app:
+        description: 'Select the application to remove'
+        required: true
+        type: choice
+        options:
+          - python
+        default: python
 
 # Required if using OIDC for authentication in 2026
 permissions:
@@ -47,11 +54,11 @@ jobs:
       - name: 'Undeploy LOB application with Helm'
         run: |
           helm uninstall ${{ vars.HELM_LOB_REPO }} \
-          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}-${{ inputs.app }} \
           --ignore-not-found
 
       - uses: actions-hub/kubectl@master
         env:
           KUBE_CONFIG: ${{ secrets.KUBECONFIG_BASE64 }}
         with:
-          args: delete namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} --ignore-not-found
+          args: delete namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}-${{ inputs.app }} --ignore-not-found

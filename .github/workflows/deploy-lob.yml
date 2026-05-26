@@ -1,4 +1,4 @@
-name: Deploy Python Web Service to K8s
+name: Deploy Lob App to K8s
 
 on:
   workflow_dispatch:
@@ -57,7 +57,7 @@ jobs:
       - name: 'Deploy LOB application with Helm'
         run: |
           helm install ${{ vars.HELM_LOB_REPO }} helm/probs/python \
-          --set namespace.name=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --set namespace.name=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}-${{ inputs.app }} \
           --set secretName=${{ vars.REGISTRY_SECRET_NAME }} \
           --set containerRegistry.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
           --set containerRegistry.username=${{ secrets.REGISTRY_USERNAME }} \
