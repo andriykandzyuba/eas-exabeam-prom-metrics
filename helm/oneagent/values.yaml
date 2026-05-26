@@ -31,6 +31,8 @@ metadataEnrichment:
 # Configuration for OneAgent instances
 oneAgent:
   # Enables cloud-native fullstack monitoring
+  hostGroup: integration-probs
+
   cloudNativeFullStack:
     tolerations:
       - effect: NoSchedule
@@ -39,6 +41,10 @@ oneAgent:
       - effect: NoSchedule
         key: node-role.kubernetes.io/control-plane
         operator: Exists
+      - effect: NoSchedule
+        key: kubernetes.azure.com/role
+        operator: Equals
+        value: agent
 
 # Configuration for ActiveGate instances
 activeGate:

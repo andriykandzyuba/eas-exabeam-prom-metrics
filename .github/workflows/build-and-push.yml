@@ -12,6 +12,13 @@ on:
           - stage
           - prod
         default: dev
+      app:
+        description: 'Select the application to build and push'
+        required: true
+        type: choice
+        options:
+          - python
+        default: python
   push:
     branches:
       - main
@@ -64,5 +71,6 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
-          docker build . -t ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}:${{ github.sha }} 
-          docker push ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}:${{ github.sha }}
+          docker build . -t ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}-${{ inputs.app }}:${{ github.sha }} 
+          docker push ${{ vars.REGISTRY_LOGIN_SERVER }}/${{ github.repository }}-${{ inputs.app }}:${{ github.sha }}
+        working-directory: probs/${{ inputs.app }}

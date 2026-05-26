@@ -1,4 +1,4 @@
-name: Deploy Python Web Service to K8s
+name: Deploy Lob App to K8s
 
 on:
   workflow_dispatch:
@@ -12,6 +12,13 @@ on:
           - stage
           - prod
         default: dev
+      app:
+        description: 'Select the application to deploy'
+        required: true
+        type: choice
+        options:
+          - python
+        default: python
       sha:
         description: 'Image Tag'
         required: true
@@ -49,15 +56,15 @@ jobs:
 
       - name: 'Deploy LOB application with Helm'
         run: |
-          helm install ${{ vars.HELM_LOB_REPO }} helm/lob \
-          --set namespace.name=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          helm install ${{ vars.HELM_LOB_REPO }} helm/probs/python \
+          --set namespace.name=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}-${{ inputs.app }} \
           --set secretName=${{ vars.REGISTRY_SECRET_NAME }} \
           --set containerRegistry.registry=${{ vars.REGISTRY_LOGIN_SERVER }} \
           --set containerRegistry.username=${{ secrets.REGISTRY_USERNAME }} \
           --set containerRegistry.password=${{ secrets.REGISTRY_PASSWORD }} \
           --set containerRegistry.email=${{ vars.REGISTRY_EMAIL }} \
           --set image.repository=${{ vars.REGISTRY_LOGIN_SERVER }} \
-          --set image.name=${{ github.repository }} \
+          --set image.name=${{ github.repository }}-${{ inputs.app }} \
           --set image.tag=${{ inputs.sha }} \
-          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
+          --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}-${{ inputs.app }} \
           --create-namespace
