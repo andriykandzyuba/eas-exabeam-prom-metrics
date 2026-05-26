@@ -64,7 +64,7 @@ jobs:
           --set containerRegistry.password=${{ secrets.REGISTRY_PASSWORD }} \
           --set containerRegistry.email=${{ vars.REGISTRY_EMAIL }} \
           --set image.repository=${{ vars.REGISTRY_LOGIN_SERVER }} \
-          --set image.name=${{ github.repository }}-${{ input.app }} \
+          --set image.name=${{ github.repository }}-${{ inputs.app }} \
           --set image.tag=${{ inputs.sha }} \
           --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }} \
           --create-namespace
