@@ -23,7 +23,7 @@ Create a default fully qualified app name.
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
-{{- printf "%s-%s-%s" .Release.Name .Values.environment .Values.app | trunc 63 | trimSuffix "-" }}
+{{- printf "%s" .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 {{- end }}
 
