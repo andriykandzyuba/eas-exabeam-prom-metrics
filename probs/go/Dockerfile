@@ -25,6 +25,6 @@ USER appuser
 # Copy the binary from the builder stage
 COPY --from=builder /app/main .
 
-EXPOSE 8000
+EXPOSE 8080 8000
 
 CMD ["./main"]

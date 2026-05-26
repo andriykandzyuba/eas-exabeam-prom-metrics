@@ -18,6 +18,6 @@ COPY app ./app
 
 ENV PATH=/home/appuser/.local/bin:$PATH
 
-EXPOSE 8000
+EXPOSE 8080 8000
 
 CMD ["python", "-u", "app/main.py"]

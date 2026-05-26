@@ -64,8 +64,10 @@ podAnnotations:
 # Container configuration
 container:
   name: lob-app
-  port: 8000
-  portName: http-metrics
+  httpPort: 8080
+  metricsPort: 8000
+  httpPortName: http
+  metricsPortName: metrics
 
 # Additional environment variables from secrets or configmaps
 envFrom: []
@@ -82,8 +84,10 @@ resources:
 # Service configuration
 service:
   type: ClusterIP
-  port: 80
-  targetPort: 8000
+  httpPort: 8080
+  targetHttpPort: 8080
+  metricsPort: 8000
+  targetMetricsPort: 8000
 
 # Node selector
 nodeSelector: {}
@@ -105,7 +109,7 @@ livenessProbe:
   enabled: false
   httpGet:
     path: /health
-    port: http-metrics
+    port: http
   initialDelaySeconds: 30
   periodSeconds: 10
 
@@ -114,6 +118,6 @@ readinessProbe:
   enabled: false
   httpGet:
     path: /health
-    port: http-metrics
+    port: http
   initialDelaySeconds: 5
   periodSeconds: 10
