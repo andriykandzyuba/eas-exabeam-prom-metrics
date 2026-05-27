@@ -5,8 +5,6 @@ import (
 	"math/rand"
 	"time"
 
-	"fmt"
-
     "github.com/prometheus/client_golang/prometheus"
     "github.com/prometheus/client_golang/prometheus/promauto"
 )
@@ -49,8 +47,6 @@ func RunMetricsSimulation(ctx context.Context) {
 
 			// Simulate latency between 50ms and 1500ms
 			fakeLatency := float64(rand.Intn(1450)+50) / 1000.0
-
-            fmt.Printf("Simulating metrics")
 
 			// Update metrics
 			simulatedRequestsTotal.WithLabelValues(endpoint, status).Inc()

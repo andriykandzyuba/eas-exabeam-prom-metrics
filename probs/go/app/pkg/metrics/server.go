@@ -15,7 +15,8 @@ type Server struct {
 func NewServer(port int) *Server {
 	mux := http.NewServeMux()
 
-    mux.Handle("/metrics", promhttp.Handler())
+	// Use promhttp.Handler() which uses the default prometheus registry
+	mux.Handle("/metrics", promhttp.Handler())
 
 	return &Server{
 		httpServer: &http.Server{
@@ -26,7 +27,7 @@ func NewServer(port int) *Server {
 }
 
 func (s *Server) Start() error {
-	fmt.Printf("HTTP Server starting on %s...\n", s.httpServer.Addr)
+	fmt.Printf("Metrics Server starting on %s...\n", s.httpServer.Addr)
 	if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		return err
 	}
