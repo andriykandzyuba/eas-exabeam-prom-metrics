@@ -18,6 +18,7 @@ on:
         type: choice
         options:
           - python
+          - go
         default: python
 
 # Required if using OIDC for authentication in 2026

@@ -1,4 +1,4 @@
-# Default values for python-web-service
+# Default values for lob-app
 # This is a YAML-formatted file.
 
 # Namespace configuration
@@ -36,8 +36,8 @@ replicaCount: 1
 # Image configuration
 image:
   repository: localhost
-  name: test/python-web-service
-  tag: "v0.0.3"
+  name: lob-app
+  tag: "latest"
   pullPolicy: IfNotPresent
   
 # Service account configuration
@@ -46,13 +46,11 @@ serviceAccount:
   name: ""
 
 # Pod labels
-podLabels:
-  instrumentation.opentelemetry.io/inject-python: "true"
+podLabels: {}
 
 # Environment variables
 env:
   OTEL_METRICS_EXPORTER: "prometheus"
-  OTEL_SERVICE_NAME: &otelServiceName "python-web-service"
 
 # Pod annotations for Prometheus scraping
 podAnnotations:
@@ -62,13 +60,15 @@ podAnnotations:
   prometheus.io/scheme: "http"
   # Dynatrace OneAgent annotations (optional, only if using Dynatrace OneAgent for monitoring)
   metadata.dynatrace.com/k8s.namespace.label.domain: sandbox
-  metadata.dynatrace.com/k8s.namespace.label.otel.service.name: *otelServiceName
+  metadata.dynatrace.com/dt.security_context: sg_sandbox
 
 # Container configuration
 container:
-  name: python-web-service
-  port: 8000
-  portName: http-metrics
+  name: lob-app
+  httpPort: 8080
+  metricsPort: 8000
+  httpPortName: http
+  metricsPortName: metrics
 
 # Additional environment variables from secrets or configmaps
 envFrom: []
@@ -85,8 +85,10 @@ resources:
 # Service configuration
 service:
   type: ClusterIP
-  port: 80
-  targetPort: 8000
+  httpPort: 8080
+  targetHttpPort: 8080
+  metricsPort: 8000
+  targetMetricsPort: 8000
 
 # Node selector
 nodeSelector: {}
@@ -108,7 +110,7 @@ livenessProbe:
   enabled: false
   httpGet:
     path: /health
-    port: http-metrics
+    port: http
   initialDelaySeconds: 30
   periodSeconds: 10
 
@@ -117,6 +119,6 @@ readinessProbe:
   enabled: false
   httpGet:
     path: /health
-    port: http-metrics
+    port: http
   initialDelaySeconds: 5
   periodSeconds: 10

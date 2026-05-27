@@ -58,13 +58,17 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ .Values.container.name }}
+        - name: {{ include "lob.fullname" . }}
           image: "{{ .Values.image.repository }}/{{.Values.image.name}}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.container.port }}
-              name: {{ .Values.container.portName }}
+            - containerPort: {{ .Values.container.httpPort }}
+              name: {{ .Values.container.httpPortName }}
+            - containerPort: {{ .Values.container.metricsPort }}
+              name: {{ .Values.container.metricsPortName }}
           env:
+            - name: OTEL_SERVICE_NAME
+              value: {{ include "lob.fullname" . | quote }}
             {{- range $key, $value := .Values.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -119,7 +123,12 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - protocol: TCP
-      port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.targetPort }}
+      port: {{ .Values.service.httpPort }}
+      targetPort: {{ .Values.service.targetHttpPort }}
+      name: http
+    - protocol: TCP
+      port: {{ .Values.service.metricsPort }}
+      targetPort: {{ .Values.service.targetMetricsPort }}
+      name: metrics
   selector:
     {{- include "lob.selectorLabels" . | nindent 4 }}
