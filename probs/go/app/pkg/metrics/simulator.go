@@ -14,7 +14,7 @@ var (
 	// Counter tracks the total number of events (only increases)
 	simulatedRequestsTotal = promauto.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "simulated_requests_total",
+			Name: "exa_requests_total",
 			Help: "Total number of simulated HTTP requests.",
 		},
 		[]string{"endpoint", "status"},
@@ -23,7 +23,7 @@ var (
 	// Histogram tracks the distribution of event durations (latencies)
 	simulatedRequestDuration = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name:    "simulated_request_duration_seconds",
+			Name:    "exa_request_duration_seconds",
 			Help:    "Simulated HTTP request latency distribution.",
 			Buckets: []float64{0.1, 0.25, 0.5, 1.0, 2.5, 5.0}, // Custom latency buckets
 		},
