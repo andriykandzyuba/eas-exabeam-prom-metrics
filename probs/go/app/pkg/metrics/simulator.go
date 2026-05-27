@@ -48,6 +48,8 @@ func RunMetricsSimulation(ctx context.Context) {
 			// Simulate latency between 50ms and 1500ms
 			fakeLatency := float64(rand.Intn(1450)+50) / 1000.0
 
+            fmt.Printf("Simulating metrics")
+
 			// Update metrics
 			simulatedRequestsTotal.WithLabelValues(endpoint, status).Inc()
 			simulatedRequestDuration.WithLabelValues(endpoint).Observe(fakeLatency)
