@@ -43,7 +43,7 @@ oneAgent:
         operator: Exists
       - effect: NoSchedule
         key: kubernetes.azure.com/role
-        operator: Equals
+        operator: Equal
         value: agent
 
 # Configuration for ActiveGate instances
