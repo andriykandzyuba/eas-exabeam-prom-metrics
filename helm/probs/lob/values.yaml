@@ -52,8 +52,8 @@ podLabels: {}
 env:
   OTEL_METRICS_EXPORTER: "prometheus"
 
-# Pod annotations for Prometheus scraping
 podAnnotations:
+  # Pod annotations for Prometheus scraping with OpenTelemetry instrumentation
   prometheus.io/scrape: "true"
   prometheus.io/path: "/metrics"
   prometheus.io/port: "8000"
@@ -61,6 +61,10 @@ podAnnotations:
   # Dynatrace OneAgent annotations (optional, only if using Dynatrace OneAgent for monitoring)
   metadata.dynatrace.com/k8s.namespace.label.domain: sandbox
   metadata.dynatrace.com/dt.security_context: sg_sandbox
+  # Pod annotations for Prometheus scraping with Dynatrace OneAgent (optional, only if using Dynatrace OneAgent for monitoring)
+  metrics.dynatrace.com/scrape: "true"
+  metrics.dynatrace.com/path: "/metrics"
+  metrics.dynatrace.com/port: "8000"
 
 # Container configuration
 container:
