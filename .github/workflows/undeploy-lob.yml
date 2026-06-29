@@ -19,6 +19,7 @@ on:
         options:
           - python
           - go
+          - js
         default: python
 
 # Required if using OIDC for authentication in 2026
