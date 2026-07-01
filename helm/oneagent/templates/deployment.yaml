@@ -28,17 +28,15 @@ spec:
     enabled: {{ .Values.metadataEnrichment.enabled }}
 
   oneAgent:
+    {{- if .Values.oneAgent.hostGroup }}
+    hostGroup: {{ .Values.oneAgent.hostGroup | quote }}
+    {{- end }}
     cloudNativeFullStack:
-      {{- if .Values.oneAgent.hostGroup }}
-      hostGroup: {{ .Values.oneAgent.hostGroup | quote }}
-      {{- end }}
-      {{- with .Values.oneAgent.cloudNativeFullStack.tolerations }}
+      {{- with .Values.oneAgent.cloudNativeFullStack }}
+      {{- with .tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.oneAgent.resources }}
-      resources:
-        {{- toYaml . | nindent 8 }}
       {{- end }}
 
   activeGate:

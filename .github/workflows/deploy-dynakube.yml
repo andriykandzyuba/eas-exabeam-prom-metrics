@@ -43,12 +43,18 @@ jobs:
         with:
           version: 'latest' # Installs the latest Helm version
 
+      - name: 'Cleanup conflicting resources'
+        run: |
+          kubectl delete mutatingwebhookconfiguration dynatrace-webhook --ignore-not-found
+          kubectl delete dynakube --all -n dynatrace --ignore-not-found
+
       - name: 'Deploy Dynatrace Operator with Helm'
         run: |
           helm upgrade --install dynatrace-operator oci://public.ecr.aws/dynatrace/dynatrace-operator \
           --create-namespace \
           --namespace dynatrace \
-          --rollback-on-failure
+          --rollback-on-failure \
+          --force
 
       # Explicitly wait for the deployment rollout to confirm readiness
       - name: 'Wait for DynaKube Operator Readiness'
@@ -68,4 +74,5 @@ jobs:
           --set secret.dataIngestToken=$DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64 \
           --namespace dynatrace \
           --create-namespace \
-          --rollback-on-failure
+          --rollback-on-failure \
+          --force
