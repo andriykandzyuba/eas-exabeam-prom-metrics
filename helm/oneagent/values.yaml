@@ -46,6 +46,14 @@ oneAgent:
         operator: Equal
         value: agent
 
+  resources:
+    requests:
+      cpu: 100m   # Reduce from higher defaults (e.g., 200m or 500m)
+      memory: 200Mi
+    limits:
+      cpu: 500m       # Consider removing this entirely to prevent throttling
+      memory: 512Mi
+
 # Configuration for ActiveGate instances
 activeGate:
   # Specifies which capabilities will be enabled on ActiveGate instances
