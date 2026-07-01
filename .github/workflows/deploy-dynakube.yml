@@ -43,11 +43,6 @@ jobs:
         with:
           version: 'latest' # Installs the latest Helm version
 
-      - name: 'Cleanup conflicting resources'
-        run: |
-          kubectl delete mutatingwebhookconfiguration dynatrace-webhook --ignore-not-found
-          kubectl delete dynakube --all -n dynatrace --ignore-not-found
-
       - name: 'Deploy Dynatrace Operator with Helm'
         run: |
           helm upgrade --install dynatrace-operator oci://public.ecr.aws/dynatrace/dynatrace-operator \
