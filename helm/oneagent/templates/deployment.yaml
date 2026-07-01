@@ -12,7 +12,25 @@ metadata:
 type: Opaque
 {{- end }}
 ---
-apiVersion: dynatrace.com/v1beta6
+apiVersion: dynatrace.com/v1beta5
+kind: DynaKube
+metadata:
+  name: {{ .Values.dynakubeK8sMonitoringName }}
+  namespace: {{ include "oneagent.namespace" . }}
+  labels:
+    {{- include "oneagent.labels" . | nindent 4 }}
+spec:
+  apiUrl: {{ required "apiUrl is required" .Values.apiUrl }}
+  tokens: {{ .Values.secret.name }}
+  skipCertCheck: {{ .Values.skipCertCheck }}
+
+  activeGate:
+    capabilities:
+      {{- toYaml .Values.activeGateK8sMonitoring.capabilities | nindent 6 }}
+    resources:
+      {{- toYaml .Values.activeGateK8sMonitoring.resources | nindent 6 }}
+---
+apiVersion: dynatrace.com/v1beta5
 kind: DynaKube
 metadata:
   name: {{ .Values.dynakubeName }}
@@ -48,3 +66,4 @@ spec:
       {{- toYaml .Values.activeGate.capabilities | nindent 6 }}
     resources:
       {{- toYaml .Values.activeGate.resources | nindent 6 }}
+    replicas: {{ .Values.activeGate.replicas }}
