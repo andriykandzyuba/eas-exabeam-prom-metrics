@@ -32,10 +32,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.oneAgent.resources }}
-      resources:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+    {{- with .Values.oneAgent.resources }}
+    resources:
+      {{- toYaml . | nindent 8 }}
+    {{- end }}
 
   activeGate:
     capabilities:
