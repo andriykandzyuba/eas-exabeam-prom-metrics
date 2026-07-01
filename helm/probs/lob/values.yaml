@@ -58,7 +58,7 @@ podAnnotations:
   prometheus.io/path: "/metrics"
   prometheus.io/port: "8000"
   prometheus.io/scheme: "http"
-  # Dynatrace OneAgent annotations (optional, only if using Dynatrace OneAgent for monitoring)
+  # Dynatrace ActiveGate annotations (optional, only if using Dynatrace OneAgent for monitoring)
   metadata.dynatrace.com/k8s.namespace.label.domain: sandbox
   metadata.dynatrace.com/dt.security_context: sg_sandbox
   # Pod annotations for Prometheus scraping with Dynatrace OneAgent (optional, only if using Dynatrace OneAgent for monitoring)
