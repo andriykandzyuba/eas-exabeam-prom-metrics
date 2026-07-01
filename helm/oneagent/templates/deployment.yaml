@@ -21,6 +21,7 @@ metadata:
     {{- include "oneagent.labels" . | nindent 4 }}
 spec:
   apiUrl: {{ required "apiUrl is required" .Values.apiUrl }}
+  tokens: {{ .Values.secret.name }}
   skipCertCheck: {{ .Values.skipCertCheck }}
 
   metadataEnrichment:
@@ -28,20 +29,20 @@ spec:
 
   oneAgent:
     cloudNativeFullStack:
+      {{- if .Values.oneAgent.hostGroup }}
+      hostGroup: {{ .Values.oneAgent.hostGroup | quote }}
+      {{- end }}
       {{- with .Values.oneAgent.cloudNativeFullStack.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with .Values.oneAgent.resources }}
-    resources:
-      {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- with .Values.oneAgent.resources }}
+      resources:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
 
   activeGate:
     capabilities:
       {{- toYaml .Values.activeGate.capabilities | nindent 6 }}
     resources:
       {{- toYaml .Values.activeGate.resources | nindent 6 }}
-
-  logMonitoring:
-    {{- toYaml .Values.logMonitoring | nindent 4 }}
