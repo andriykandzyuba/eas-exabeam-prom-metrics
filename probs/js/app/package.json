@@ -1,0 +1,13 @@
+{
+  "name": "js-prob",
+  "version": "1.0.0",
+  "description": "Node.js application prob with metrics simulation",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.19.2",
+    "prom-client": "^15.1.2"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}

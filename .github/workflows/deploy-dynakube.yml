@@ -48,7 +48,8 @@ jobs:
           helm upgrade --install dynatrace-operator oci://public.ecr.aws/dynatrace/dynatrace-operator \
           --create-namespace \
           --namespace dynatrace \
-          --rollback-on-failure
+          --rollback-on-failure \
+          --force
 
       # Explicitly wait for the deployment rollout to confirm readiness
       - name: 'Wait for DynaKube Operator Readiness'
@@ -68,4 +69,5 @@ jobs:
           --set secret.dataIngestToken=$DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64 \
           --namespace dynatrace \
           --create-namespace \
-          --rollback-on-failure
+          --rollback-on-failure \
+          --force
