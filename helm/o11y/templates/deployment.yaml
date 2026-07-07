@@ -114,7 +114,7 @@ spec:
                 - source_labels: [ __meta_kubernetes_pod_node_name ]
                   action: keep
                   # 2. MATCH ONLY targets where node name equals the current collector's node name
-                  regex: ${env:KUBE_NODE_NAME}
+                  regex: ${env:K8S_NODE_NAME}
 
                 # 3. Standard annotations filtering (Only scrape pods with prometheus.io/scrape: "true")
                 - source_labels: [ __meta_kubernetes_pod_annotation_prometheus_io_scrape ]
