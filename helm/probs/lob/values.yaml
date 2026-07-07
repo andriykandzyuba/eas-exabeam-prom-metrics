@@ -61,8 +61,8 @@ podAnnotations:
   # Dynatrace ActiveGate annotations (optional, only if using Dynatrace OneAgent for monitoring)
   metadata.dynatrace.com/k8s.namespace.label.domain: sandbox
   metadata.dynatrace.com/dt.security_context: sg_sandbox
-  # Pod annotations for Prometheus scraping with Dynatrace OneAgent (optional, only if using Dynatrace OneAgent for monitoring)
-  metrics.dynatrace.com/scrape: "true"
+  # Do not enable both Prometheus and Dynatrace scraping at the same time unless you have a specific use case for it.
+  metrics.dynatrace.com/scrape: "false"
   metrics.dynatrace.com/path: "/metrics"
   metrics.dynatrace.com/port: "8000"
 
