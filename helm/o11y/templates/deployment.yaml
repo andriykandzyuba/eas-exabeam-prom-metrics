@@ -62,7 +62,7 @@ metadata:
   labels:
     {{- include "o11y.labels" . | nindent 4 }}
 data:
-  DT_ENDPOINT: {{ .Values.config.dtEndpoint | quote }}
+  DT_OTEL_ENDPOINT: {{ .Values.config.dtEndpoint | quote }}
 {{- end }}
 ---
 apiVersion: opentelemetry.io/v1beta1
