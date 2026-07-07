@@ -45,6 +45,10 @@ spec:
   metadataEnrichment:
     enabled: {{ .Values.metadataEnrichment.enabled }}
 
+  telemetryIngest:
+    protocols:
+      - otlp
+
   oneAgent:
     {{- if .Values.oneAgent.hostGroup }}
     hostGroup: {{ .Values.oneAgent.hostGroup | quote }}
