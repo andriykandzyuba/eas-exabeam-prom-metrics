@@ -124,8 +124,6 @@ spec:
                   source_labels:
                     - __meta_kubernetes_pod_annotation_prometheus_io_scrape
                     - __meta_kubernetes_pod_annotationpresent_prometheus_io_scrape
-                    - __meta_kubernetes_pod_annotation_metrics_dynatrace_com_scrape
-                    - __meta_kubernetes_pod_annotationpresent_metrics_dynatrace_com_scrape
                 - action: replace
                   regex: (.+?)(?::\d+)?;(\d+);true
                   replacement: $$1:$$2
@@ -133,16 +131,12 @@ spec:
                     - __address__
                     - __meta_kubernetes_pod_annotation_prometheus_io_port
                     - __meta_kubernetes_pod_annotationpresent_prometheus_io_port
-                    - __meta_kubernetes_pod_annotation_metrics_dynatrace_com_port
-                    - __meta_kubernetes_pod_annotationpresent_metrics_dynatrace_com_port
                   target_label: __address__
                 - action: replace
                   regex: (.+);true
                   source_labels:
                     - __meta_kubernetes_pod_annotation_prometheus_io_path
                     - __meta_kubernetes_pod_annotationpresent_prometheus_io_path
-                    - __meta_kubernetes_pod_annotation_metrics_dynatrace_com_paht
-                    - __meta_kubernetes_pod_annotationpresent_metrics_dynatrace_com_path
                   target_label: __metrics_path__
                 - action: drop
                   regex: (Failed|Succeeded)
