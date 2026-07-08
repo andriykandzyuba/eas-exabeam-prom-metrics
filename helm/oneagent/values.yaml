@@ -31,6 +31,16 @@ skipCertCheck: false
 metadataEnrichment:
   enabled: true
 
+# Configuration for Telemetry Ingest
+telemetryIngest:
+  protocols:
+    - otlp
+
+# Configuration for templates
+templates:
+  otelCollector:
+    replicas: 1
+
 # Configuration for OneAgent instances
 oneAgent:
   hostGroup: integration-probs

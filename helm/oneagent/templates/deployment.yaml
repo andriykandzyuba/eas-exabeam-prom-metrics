@@ -46,8 +46,9 @@ spec:
     enabled: {{ .Values.metadataEnrichment.enabled }}
 
   telemetryIngest:
-    protocols:
-      - otlp
+    {{- toYaml .Values.telemetryIngest | nindent 4 }}
+  templates:
+    {{- toYaml .Values.templates | nindent 4 }}
 
   oneAgent:
     {{- if .Values.oneAgent.hostGroup }}
