@@ -54,10 +54,10 @@ env:
 
 podAnnotations:
   # Pod annotations for Prometheus scraping with OpenTelemetry instrumentation
-  # prometheus.io/scrape: "true"
-  # prometheus.io/path: "/metrics"
-  # prometheus.io/port: "8000"
-  # prometheus.io/scheme: "http"
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/metrics"
+  prometheus.io/port: "8000"
+  prometheus.io/scheme: "http"
   # Dynatrace ActiveGate annotations (optional, only if using Dynatrace OneAgent for monitoring)
   metadata.dynatrace.com/k8s.namespace.label.domain: sandbox
   metadata.dynatrace.com/dt.security_context: sg_sandbox
