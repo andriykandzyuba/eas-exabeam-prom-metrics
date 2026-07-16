@@ -25,6 +25,14 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
 
+    private final static Counter totalRequests = Counter.builder()
+            .name("esa_http_monitor_requests_total")
+            .register();
+
+    private final static Counter totalSuccessful = Counter.builder()
+            .name("esa_http_monitor_requests_successful")
+            .register();
+
     public static void main(String[] args) {
         Logger logger = LogManager.getLogger("Main");
 
@@ -84,14 +92,6 @@ public class Main {
         logger.info("Health Port: {}", healthPort);
 
         PrometheusRegistry prometheusRegistry = PrometheusRegistry.defaultRegistry;
-
-        Counter totalRequests = Counter.builder()
-                .name("esa_http_monitor_requests_total")
-                .register(prometheusRegistry);
-
-        Counter totalSuccessful = Counter.builder()
-                .name("esa_http_monitor_requests_successful")
-                .register(prometheusRegistry);
 
         HTTPServer prometheusServer;
         HttpServer healthServer;
