@@ -25,26 +25,28 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         Logger logger = LogManager.getLogger("Main");
 
         logger.info("Starting HTTP monitor!");
-        logger.info("Program arguments: {}", Arrays.toString(args));
 
-        // Default values
+        // Default values from environment variables
         String testEndpoint = "https://example.com";
         int connectTimeoutSec = 10;
         int requestTimeoutSec = 10;
         int repeatIntervalSec = 60;
         int awaitTerminationSec = 30;
         int prometheusPort = 8000;
+        int healthPort = 8080;
         List<String> headers = new ArrayList<>();
 
         // Simple argument parsing
+        logger.info("Program arguments: {}", Arrays.toString(args));
+
         for (String arg : args) {
-            if (arg.startsWith("--uri=")) {
+            if (arg.startsWith("--endpoint=") || arg.startsWith("--uri=")) {
                 testEndpoint = arg.split("=")[1];
-            } else if (arg.startsWith("--connectTimeout=")) {
+            } else if (arg.startsWith("--connectionTimeout=") || arg.startsWith("--connectTimeout=")) {
                 connectTimeoutSec = Integer.parseInt(arg.split("=")[1]);
             } else if (arg.startsWith("--requestTimeout=")) {
                 requestTimeoutSec = Integer.parseInt(arg.split("=")[1]);
@@ -54,12 +56,16 @@ public class Main {
                 awaitTerminationSec = Integer.parseInt(arg.split("=")[1]);
             } else if (arg.startsWith("--prometheusPort=")) {
                 prometheusPort = Integer.parseInt(arg.split("=")[1]);
+            } else if (arg.startsWith("--healthPort=")) {
+                healthPort = Integer.parseInt(arg.split("=")[1]);
             } else if (arg.startsWith("--header=")) {
                 String[] parts = arg.split("=")[1].split(":", 2);
                 if (parts.length == 2) {
                     headers.add(parts[0]);
                     headers.add(parts[1]);
                 }
+            } else if (arg.startsWith("-")) {
+                logger.warn("Unrecognized argument: {}. If this is a container engine flag (like -p or -e), it must be placed BEFORE the image name in the 'podman run' or 'docker run' command.", arg);
             }
         }
 
@@ -75,6 +81,7 @@ public class Main {
         logger.info("Repeat Interval: {} seconds", repeatIntervalSec);
         logger.info("Await Termination: {} seconds", awaitTerminationSec);
         logger.info("Prometheus Port: {}", prometheusPort);
+        logger.info("Health Port: {}", healthPort);
 
         PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
 
@@ -86,14 +93,16 @@ public class Main {
                 .tag("dimension", "total_successful")
                 .register(prometheusRegistry);
 
-        HttpServer server;
+        HttpServer prometheusServer;
+        HttpServer healthServer;
         try {
-            server = HttpServer.create(new InetSocketAddress(prometheusPort), 0);
+            prometheusServer = HttpServer.create(new InetSocketAddress(prometheusPort), 0);
+            healthServer = HttpServer.create(new InetSocketAddress(healthPort), 0);
         } catch (IOException e) {
-            logger.error("Failed to start Prometheus server: {}", e.getMessage());
+            logger.error("Failed to start HTTP servers: {}", e.getMessage());
             throw new RuntimeException(e);
         }
-        server.createContext("/metrics", httpExchange -> {
+        prometheusServer.createContext("/metrics", httpExchange -> {
             String response = prometheusRegistry.scrape();
             httpExchange.sendResponseHeaders(200, response.getBytes().length);
             try (OutputStream os = httpExchange.getResponseBody()) {
@@ -101,7 +110,16 @@ public class Main {
             }
         });
 
-        server.start();
+        healthServer.createContext("/health", httpExchange -> {
+            String response = "OK";
+            httpExchange.sendResponseHeaders(200, response.getBytes().length);
+            try (OutputStream os = httpExchange.getResponseBody()) {
+                os.write(response.getBytes());
+            }
+        });
+
+        prometheusServer.start();
+        healthServer.start();
 
         HttpClient client = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(connectTimeoutSec))
@@ -125,7 +143,8 @@ public class Main {
                 scheduler.shutdownNow();
             }
             client.close();
-            server.stop(0);
+            prometheusServer.stop(0);
+            healthServer.stop(0);
             shutdownLatch.countDown();
             logger.info("Shutdown complete.");
         }));
@@ -164,7 +183,8 @@ public class Main {
         } finally {
             scheduler.shutdownNow();
             client.close();
-            server.stop(0);
+            prometheusServer.stop(0);
+            healthServer.stop(0);
         }
     }
 }
