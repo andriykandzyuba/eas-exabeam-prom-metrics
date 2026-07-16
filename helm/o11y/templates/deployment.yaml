@@ -100,7 +100,6 @@ spec:
   config:
     receivers:
       prometheus:
-        report_extra_scrape_metrics: false
         config:
           scrape_configs:
             - job_name: 'kubernetes-pods'
