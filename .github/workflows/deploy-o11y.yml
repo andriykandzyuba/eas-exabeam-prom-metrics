@@ -19,6 +19,7 @@ on:
         options:
           - python
           - go
+          - js
         default: python
 
 # Required if using OIDC for authentication in 2026
@@ -68,7 +69,7 @@ jobs:
           helm install ${{ vars.HELM_OTEL_REPO }} helm/o11y \
           --set namespace.name=${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} \
           --set secret.dtApiToken=${{ secrets.DT_DYNAKUBE_DATA_INGEST_TOKEN }} \
-          --set config.dtEndpoint=https://${{ vars.DT_ENVIRONMENT_ID }}.live.dynatrace.com/api/v2/otlp \
+          --set config.dtEndpoint=${{ vars.DT_OTEL_ENDPOINT }} \
           --set "prometheus.namespaces[0]=${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}-${{ inputs.app }}" \
           --namespace ${{ vars.K8S_NS_O11Y_PREFIX }}-${{ inputs.environment }} \
           --create-namespace
