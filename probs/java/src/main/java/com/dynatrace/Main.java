@@ -1,9 +1,9 @@
 package com.dynatrace;
 
 import com.sun.net.httpserver.HttpServer;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.prometheus.PrometheusConfig;
-import io.micrometer.prometheus.PrometheusMeterRegistry;
+import io.prometheus.metrics.core.metrics.Counter;
+import io.prometheus.metrics.exporter.httpserver.HTTPServer;
+import io.prometheus.metrics.model.registry.PrometheusRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -83,30 +83,28 @@ public class Main {
         logger.info("Prometheus Port: {}", prometheusPort);
         logger.info("Health Port: {}", healthPort);
 
-        PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+        PrometheusRegistry prometheusRegistry = PrometheusRegistry.defaultRegistry;
 
-        Counter totalRequests = Counter.builder("esa_http_monitor_total_requests")
+        Counter totalRequests = Counter.builder()
+                .name("esa_http_monitor_requests_total")
                 .register(prometheusRegistry);
 
-        Counter totalSuccessful = Counter.builder("esa_http_monitor_total_successful")
+        Counter totalSuccessful = Counter.builder()
+                .name("esa_http_monitor_requests_successful")
                 .register(prometheusRegistry);
 
-        HttpServer prometheusServer;
+        HTTPServer prometheusServer;
         HttpServer healthServer;
         try {
-            prometheusServer = HttpServer.create(new InetSocketAddress(prometheusPort), 0);
+            prometheusServer = HTTPServer.builder()
+                    .port(prometheusPort)
+                    .registry(prometheusRegistry)
+                    .buildAndStart();
             healthServer = HttpServer.create(new InetSocketAddress(healthPort), 0);
         } catch (IOException e) {
             logger.error("Failed to start HTTP servers: {}", e.getMessage());
             throw new RuntimeException(e);
         }
-        prometheusServer.createContext("/metrics", httpExchange -> {
-            String response = prometheusRegistry.scrape();
-            httpExchange.sendResponseHeaders(200, response.getBytes().length);
-            try (OutputStream os = httpExchange.getResponseBody()) {
-                os.write(response.getBytes());
-            }
-        });
 
         healthServer.createContext("/health", httpExchange -> {
             String response = "OK";
@@ -116,7 +114,6 @@ public class Main {
             }
         });
 
-        prometheusServer.start();
         healthServer.start();
 
         HttpClient client = HttpClient.newBuilder()
@@ -141,7 +138,7 @@ public class Main {
                 scheduler.shutdownNow();
             }
             client.close();
-            prometheusServer.stop(0);
+            prometheusServer.stop();
             healthServer.stop(0);
             shutdownLatch.countDown();
             logger.info("Shutdown complete.");
@@ -157,14 +154,14 @@ public class Main {
             // 3. Schedule the task: initial delay of 0s
             scheduler.scheduleAtFixedRate(() -> {
                 try {
-                    totalRequests.increment();
+                    totalRequests.inc();
                     HttpResponse<String> response = client.send(
                             request,
                             HttpResponse.BodyHandlers.ofString()
                     );
 
                     if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                        totalSuccessful.increment();
+                        totalSuccessful.inc();
                     }
 
                     logger.info("Status: {}, Response: {}", response.statusCode(), response.body());
@@ -181,7 +178,7 @@ public class Main {
         } finally {
             scheduler.shutdownNow();
             client.close();
-            prometheusServer.stop(0);
+            prometheusServer.stop();
             healthServer.stop(0);
         }
     }
