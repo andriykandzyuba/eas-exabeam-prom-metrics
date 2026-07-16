@@ -85,12 +85,10 @@ public class Main {
 
         PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
 
-        Counter totalRequests = Counter.builder("esa.http.monitor")
-                .tag("dimension", "total_requests")
+        Counter totalRequests = Counter.builder("esa.http.monitor.total_requests")
                 .register(prometheusRegistry);
 
-        Counter totalSuccessful = Counter.builder("esa.http.monitor")
-                .tag("dimension", "total_successful")
+        Counter totalSuccessful = Counter.builder("esa.http.monitor.total_successful")
                 .register(prometheusRegistry);
 
         HttpServer prometheusServer;
