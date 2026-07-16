@@ -1,7 +1,7 @@
 package com.dynatrace;
 
 import com.sun.net.httpserver.HttpServer;
-import io.prometheus.metrics.core.metrics.Counter;
+import io.prometheus.metrics.core.metrics.Histogram;
 import io.prometheus.metrics.exporter.httpserver.HTTPServer;
 import io.prometheus.metrics.model.registry.PrometheusRegistry;
 import org.apache.logging.log4j.LogManager;
@@ -25,12 +25,12 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
 
-    private final static Counter totalRequests = Counter.builder()
-            .name("esa_http_monitor_requests_total")
+    private final static Histogram totalRequests = Histogram.builder()
+            .name("esa_http_monitor_total_requests")
             .register();
 
-    private final static Counter totalSuccessful = Counter.builder()
-            .name("esa_http_monitor_requests_successful")
+    private final static Histogram totalSuccessful = Histogram.builder()
+            .name("esa_http_monitor_total_successful_requests")
             .register();
 
     public static void main(String[] args) {
@@ -154,14 +154,14 @@ public class Main {
             // 3. Schedule the task: initial delay of 0s
             scheduler.scheduleAtFixedRate(() -> {
                 try {
-                    totalRequests.inc();
+                    totalRequests.observe(1.0);
                     HttpResponse<String> response = client.send(
                             request,
                             HttpResponse.BodyHandlers.ofString()
                     );
 
                     if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                        totalSuccessful.inc();
+                        totalSuccessful.observe(1.0);
                     }
 
                     logger.info("Status: {}, Response: {}", response.statusCode(), response.body());
