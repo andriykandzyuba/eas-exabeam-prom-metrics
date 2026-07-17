@@ -61,12 +61,8 @@ spec:
         - name: {{ include "lob.fullname" . }}
           image: "{{ .Values.image.repository }}/{{.Values.image.name}}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- with .Values.args }}
           args:
-            {{- range . }}
-            - {{ . | quote }}
-            {{- end }}
-          {{- end }}
+            - {{ .Values.rawArgs | quote }}
           ports:
             - containerPort: {{ .Values.container.httpPort }}
               name: {{ .Values.container.httpPortName }}
