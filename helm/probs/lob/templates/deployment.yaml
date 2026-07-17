@@ -63,7 +63,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.args }}
           args:
-            {{- toYaml . | nindent 8 }}
+            {{- range . }}
+            - {{ . | quote }}
+            {{- end }}
           {{- end }}
           ports:
             - containerPort: {{ .Values.container.httpPort }}
@@ -135,4 +137,4 @@ spec:
       targetPort: {{ .Values.service.targetMetricsPort }}
       name: metrics
   selector:
-    {{- include "lob.selectorLabels" . | nindent 4 }}
+{{- include "lob.selectorLabels" . | nindent 4 }}
