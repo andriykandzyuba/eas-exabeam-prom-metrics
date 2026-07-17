@@ -69,6 +69,6 @@ jobs:
           --set image.repository=${{ vars.REGISTRY_LOGIN_SERVER }} \
           --set image.name=${{ github.repository }}-${{ inputs.app }} \
           --set image.tag=${{ inputs.sha }} \
-          --set-string "rawArgs=\"${{ vars.LOB_ARGS }}\""
+          --set-string "rawArgs=\"${{ vars.LOB_ARGS }}\"" \
           --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}-${{ inputs.app }} \
           --create-namespace
