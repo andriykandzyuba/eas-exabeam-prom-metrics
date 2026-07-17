@@ -62,9 +62,9 @@ podAnnotations:
   # metadata.dynatrace.com/k8s.namespace.label.domain: sandbox
   # metadata.dynatrace.com/dt.security_context: sg_sandbox
   # Do not enable both Prometheus and Dynatrace scraping at the same time unless you have a specific use case for it.
-  # metrics.dynatrace.com/scrape: "true"
-  # metrics.dynatrace.com/path: "/metrics"
-  # metrics.dynatrace.com/port: "8000"
+  metrics.dynatrace.com/scrape: "false"
+  metrics.dynatrace.com/path: "/metrics"
+  metrics.dynatrace.com/port: "8000"
 
 # Container configuration
 container:
