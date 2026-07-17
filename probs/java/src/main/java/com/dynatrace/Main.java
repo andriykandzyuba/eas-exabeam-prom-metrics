@@ -1,5 +1,6 @@
 package com.dynatrace;
 
+import com.dynatrace.trace.TraceFilter;
 import com.sun.net.httpserver.HttpServer;
 import io.prometheus.metrics.core.metrics.Counter;
 import io.prometheus.metrics.exporter.httpserver.HTTPServer;
@@ -26,11 +27,11 @@ import java.util.concurrent.TimeUnit;
 public class Main {
 
     private final static Counter totalRequests = Counter.builder()
-            .name("esa_http_monitor_requests")
+            .name("esa_http_monitor_requests_total")
             .register();
 
     private final static Counter totalSuccessful = Counter.builder()
-            .name("esa_http_monitor_successful_requests")
+            .name("esa_http_monitor_requests_successful")
             .register();
 
     public static void main(String[] args) {
@@ -144,17 +145,27 @@ public class Main {
             logger.info("Shutdown complete.");
         }));
 
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(testEndpoint))
-                    .headers(headers.toArray(new String[0]))
-                    .timeout(Duration.ofSeconds(requestTimeoutSec))
-                    .build();
+        final String finalTestEndpoint = testEndpoint;
+        final int finalRequestTimeoutSec = requestTimeoutSec;
+        final List<String> finalHeaders = headers;
 
+        try {
             // 3. Schedule the task: initial delay of 0s
             scheduler.scheduleAtFixedRate(() -> {
                 try {
                     totalRequests.inc();
+
+                    HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                            .uri(URI.create(finalTestEndpoint))
+                            .timeout(Duration.ofSeconds(finalRequestTimeoutSec))
+                            .header("traceparent", TraceFilter.generateTraceparent());
+
+                    for (int i = 0; i < finalHeaders.size(); i += 2) {
+                        requestBuilder.header(finalHeaders.get(i), finalHeaders.get(i + 1));
+                    }
+
+                    HttpRequest request = requestBuilder.build();
+
                     HttpResponse<String> response = client.send(
                             request,
                             HttpResponse.BodyHandlers.ofString()
