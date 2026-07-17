@@ -53,7 +53,7 @@ public class Main {
         logger.info("Program arguments: {}", Arrays.toString(args));
 
         for (String arg : args) {
-            if (arg.startsWith("--endpoint=") || arg.startsWith("--uri=")) {
+            if (arg.startsWith("--endpoint=")) {
                 testEndpoint = arg.split("=")[1];
             } else if (arg.startsWith("--connectionTimeout=") || arg.startsWith("--connectTimeout=")) {
                 connectTimeoutSec = Integer.parseInt(arg.split("=")[1]);
