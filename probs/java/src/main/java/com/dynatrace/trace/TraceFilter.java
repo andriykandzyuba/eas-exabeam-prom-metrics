@@ -4,9 +4,15 @@ import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 
 public class TraceFilter extends Filter {
+
+    private static final Logger logger = LogManager.getLogger(TraceFilter.class);
+
     @Override
     public String description() {
         return "Injects W3C Traceparent / Tracestate headers";
@@ -38,6 +44,9 @@ public class TraceFilter extends Filter {
             traceId = generateRandomHex(32);
             parentSpanId = generateRandomHex(16);
         }
+
+        // Print trace context
+        logger.info("Trace Context - Trace ID: {}, Parent Span ID: {}, Trace Flags: {}", traceId, parentSpanId, traceFlags);
 
         // Construct the outgoing W3C traceparent
         String outgoingTraceparent = String.format("00-%s-%s-%s", traceId, parentSpanId, traceFlags);
