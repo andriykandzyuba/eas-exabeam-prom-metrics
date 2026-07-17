@@ -63,6 +63,9 @@ public class TraceFilter extends Filter {
         String traceId = generateRandomHex(32);
         String parentSpanId = generateRandomHex(16);
         String traceFlags = "01"; // Recorded
+        // Print trace context
+        logger.info("Trace Context - Trace ID: {}, Parent Span ID: {}, Trace Flags: {}", traceId, parentSpanId, traceFlags);
+
         return String.format("00-%s-%s-%s", traceId, parentSpanId, traceFlags);
     }
 
