@@ -66,11 +66,9 @@ podAnnotations:
   metrics.dynatrace.com/path: "/metrics"
   metrics.dynatrace.com/port: "8000"
 
-# Command and arguments for the container
-rawArgs:
-
 # Container configuration
 container:
+  args: []
   name: lob-app
   httpPort: 8080
   metricsPort: 8000
