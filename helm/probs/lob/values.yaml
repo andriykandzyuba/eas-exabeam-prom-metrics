@@ -81,11 +81,11 @@ envFrom: []
 # Resource limits and requests
 resources:
   limits:
-    cpu: "4Gi"
-    memory: "256Mi"
+    cpu: "200m"
+    memory: "4Gi"
   requests:
-    cpu: "4Gi"
-    memory: "256Mi"
+    cpu: "100m"
+    memory: "4Gi"
 
 # Service configuration
 service:
