@@ -48,12 +48,6 @@ jobs:
           --namespace logmonitoring \
           --ignore-not-found
 
-      - name: 'Uninstall Dynatrace Operator with Helm'
-        run: |
-          helm uninstall dynatrace-operator \
-          --namespace logmonitoring \
-          --ignore-not-found
-
       - uses: actions-hub/kubectl@master
         env:
           KUBE_CONFIG: ${{ secrets.KUBECONFIG_BASE64 }}

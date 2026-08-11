@@ -2,7 +2,7 @@
 # Namespace for the DynaKube resources
 namespace:
   create: true
-  name: logmonitoring
+  name: dynatrace
 
 # Dynatrace API URL including the `/api` path at the end
 # For SaaS, set ENVIRONMENTID to your environment ID
