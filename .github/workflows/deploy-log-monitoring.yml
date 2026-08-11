@@ -53,6 +53,8 @@ jobs:
           --set apiUrl=https://${{ vars.DT_ENVIRONMENT_ID }}.live.dynatrace.com/api \
           --set secret.apiToken=$DT_DYNAKUBE_API_TOKEN_BASE64 \
           --set secret.dataIngestToken=$DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64 \
+          --set templates.logMonitoring.imageRef.repository=public.ecr.aws/dynatrace/dynatrace-logmodule \
+          --set templates.logMonitoring.imageRef.tag=1.341.80.20260805-102532-fips
           --namespace dynatrace \
           --rollback-on-failure \
           --force-replace
