@@ -12,13 +12,13 @@ apiUrl: ""
 # Secret configuration for Dynatrace tokens
 secret:
   create: true
-  name: dynakube
+  name: logmonitoring
   # IMPORTANT: For production, use --set or external secrets management
   apiToken: ""
   dataIngestToken: ""
 
 # DynaKube custom resource name
-dynakubeName: dynakube
+dynakubeName: logmonitoring
 
 # Optional: Disable certificate validation checks for installer download and API communication
 skipCertCheck: false
