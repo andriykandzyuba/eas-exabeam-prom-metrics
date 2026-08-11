@@ -10,7 +10,7 @@ on:
         options:
           - dev
           - prod
-        default: dev
+        default: prod
 
 # Required if using OIDC for authentication in 2026
 permissions:
@@ -61,9 +61,9 @@ jobs:
           echo "DT_DYNAKUBE_API_TOKEN_BASE64=$( echo -n "${{ secrets.DT_DYNAKUBE_API_TOKEN }}" | base64 -w 0 )" >> $GITHUB_ENV
           echo "DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64=$( echo -n "${{ secrets.DT_DYNAKUBE_DATA_INGEST_TOKEN }}" | base64 -w 0 )" >> $GITHUB_ENV
 
-      - name: 'Deploy DynaKube OneAgent with Helm'
+      - name: 'Deploy DynaKube Log Monitoring with Helm'
         run: |
-          helm upgrade --install dynatrace-oneagent helm/oneagent \
+          helm upgrade --install dynatrace-oneagent helm/logMonitor \
           --set apiUrl=https://${{ vars.DT_ENVIRONMENT_ID }}.live.dynatrace.com/api \
           --set secret.apiToken=$DT_DYNAKUBE_API_TOKEN_BASE64 \
           --set secret.dataIngestToken=$DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64 \

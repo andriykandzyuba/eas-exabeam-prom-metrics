@@ -1,0 +1,14 @@
+apiVersion: v2
+name: dynakube-log-monitoring
+description: A Helm chart for Dynatrace DynaKube Log Monitoring deployment
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - dynatrace
+  - dynakube
+  - oneagent
+  - monitoring
+maintainers:
+  - name: Andriy Kandzyuba
+    email: andriy.kandzyuba@dynatrace.com
