@@ -44,5 +44,5 @@ jobs:
 
       - name: 'Delete Dynatrace Namespace'
         run: |
-          kubectl get namespace dynatrace -o json | jq '.spec.finalizers = []' | kubectl replace --raw "/api/v1/namespaces/dynatrace/finalize" -f -          
           kubectl delete namespace dynatrace --ignore-not-found
+          kubectl get namespace dynatrace -o json | jq '.spec.finalizers = []' | kubectl replace --raw "/api/v1/namespaces/dynatrace/finalize" -f -
