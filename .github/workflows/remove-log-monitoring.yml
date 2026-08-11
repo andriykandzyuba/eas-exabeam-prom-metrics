@@ -9,9 +9,8 @@ on:
         type: choice
         options:
           - dev
-          - stage
           - prod
-        default: dev
+        default: prod
 
 # Required if using OIDC for authentication in 2026
 permissions:
