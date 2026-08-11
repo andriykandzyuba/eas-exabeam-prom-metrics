@@ -65,7 +65,7 @@ jobs:
           --set apiUrl=https://${{ vars.DT_ENVIRONMENT_ID }}.live.dynatrace.com/api \
           --set secret.apiToken=$DT_DYNAKUBE_API_TOKEN_BASE64 \
           --set secret.dataIngestToken=$DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64 \
-          --set templates.otelCollector.imageRef.repository=public.ecr.aws/dynatrace/dynatrace-otel-collector:latest \
+          --set templates.otelCollector.imageRef.repository=public.ecr.aws/dynatrace/dynatrace-otel-collector \
           --set templates.otelCollector.imageRef.tag=latest \
           --namespace dynatrace \
           --create-namespace \
