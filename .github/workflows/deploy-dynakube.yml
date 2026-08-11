@@ -1,4 +1,4 @@
-name: Deploy Dynatrace DynaKube Operator to K8s
+name: Deploy DynaKube OneAgent
 
 on:
   workflow_dispatch:
@@ -42,18 +42,6 @@ jobs:
         with:
           version: 'latest' # Installs the latest Helm version
 
-      - name: 'Deploy Dynatrace Operator with Helm'
-        run: |
-          helm upgrade --install dynatrace-operator oci://public.ecr.aws/dynatrace/dynatrace-operator \
-          --create-namespace \
-          --namespace dynatrace \
-          --rollback-on-failure
-
-      # Explicitly wait for the deployment rollout to confirm readiness
-      - name: 'Wait for DynaKube Operator Readiness'
-        run: |
-          kubectl rollout status deployment/dynatrace-operator -n dynatrace --timeout=300s
-
       - name: 'Encode Dynatrace API Token and Data Ingest Token as Base64 and Set as Environment Variables'
         run: |
           echo "DT_DYNAKUBE_API_TOKEN_BASE64=$( echo -n "${{ secrets.DT_DYNAKUBE_API_TOKEN }}" | base64 -w 0 )" >> $GITHUB_ENV
@@ -66,8 +54,7 @@ jobs:
           --set secret.apiToken=$DT_DYNAKUBE_API_TOKEN_BASE64 \
           --set secret.dataIngestToken=$DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64 \
           --set templates.otelCollector.imageRef.repository=public.ecr.aws/dynatrace/dynatrace-otel-collector \
-          --set templates.otelCollector.imageRef.tag=latest \
+          --set templates.otelCollector.imageRef.tag=1.10.2 \
           --namespace dynatrace \
-          --create-namespace \
           --rollback-on-failure \
           --force-replace
