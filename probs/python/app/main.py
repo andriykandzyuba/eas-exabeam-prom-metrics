@@ -47,6 +47,7 @@ if __name__ == '__main__':
     logger.info('Metrics available at http://0.0.0.0:8000/metrics')
     try:
         while True:
+            logger.info('Keep generating metrics...')
             time.sleep(10)
     except KeyboardInterrupt:
         logger.info('Shutting down')

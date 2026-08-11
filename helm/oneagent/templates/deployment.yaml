@@ -47,6 +47,7 @@ spec:
 
   telemetryIngest:
     {{- toYaml .Values.telemetryIngest | nindent 4 }}
+
   templates:
     {{- toYaml .Values.templates | nindent 4 }}
 

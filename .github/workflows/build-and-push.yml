@@ -9,7 +9,6 @@ on:
         type: choice
         options:
           - dev
-          - stage
           - prod
         default: dev
       app:

@@ -42,20 +42,6 @@ jobs:
         with:
           version: 'latest' # Installs the latest Helm version
 
-      - name: 'Deploy Dynatrace Operator with Helm'
-        run: |
-          helm upgrade --install dynatrace-operator oci://public.ecr.aws/dynatrace/dynatrace-operator \
-          --create-namespace \
-          --namespace dynatrace \
-          --rollback-on-failure \
-          --atomic \
-          --force
-
-      # Explicitly wait for the deployment rollout to confirm readiness
-      - name: 'Wait for DynaKube Operator Readiness'
-        run: |
-          kubectl rollout status deployment/dynatrace-operator -n dynatrace --timeout=300s
-
       - name: 'Encode Dynatrace API Token and Data Ingest Token as Base64 and Set as Environment Variables'
         run: |
           echo "DT_DYNAKUBE_API_TOKEN_BASE64=$( echo -n "${{ secrets.DT_DYNAKUBE_API_TOKEN }}" | base64 -w 0 )" >> $GITHUB_ENV
@@ -63,12 +49,12 @@ jobs:
 
       - name: 'Deploy DynaKube Log Monitoring with Helm'
         run: |
-          helm upgrade --install dynatrace-oneagent helm/logMonitor \
+          helm upgrade --install dynatrace-log-monitoring helm/logMonitor \
           --set apiUrl=https://${{ vars.DT_ENVIRONMENT_ID }}.live.dynatrace.com/api \
           --set secret.apiToken=$DT_DYNAKUBE_API_TOKEN_BASE64 \
           --set secret.dataIngestToken=$DT_DYNAKUBE_DATA_INGEST_TOKEN_BASE64 \
+          --set templates.logMonitoring.imageRef.repository=public.ecr.aws/dynatrace/dynatrace-logmodule \
+          --set templates.logMonitoring.imageRef.tag=1.341.80.20260805-102532-fips \
           --namespace dynatrace \
-          --create-namespace \
           --rollback-on-failure \
-          --atomic \
-          --force
+          --force-replace
