@@ -1,4 +1,4 @@
-name: Deploy Dynatrace DynaKube Operator to K8s
+name: Deploy DynaKube OneAgent
 
 on:
   workflow_dispatch:

@@ -13,13 +13,13 @@ apiUrl: ""
 # Secret configuration for Dynatrace tokens
 secret:
   create: true
-  name: dynakube
+  name: dynakube-oneagent
   # IMPORTANT: For production, use --set or external secrets management
   apiToken: ""
   dataIngestToken: ""
 
 # DynaKube custom resource name
-dynakubeName: agent
+dynakubeName: oneagent
 
 # DynaKube custom resource name for Kubernetes Monitoring only
 dynakubeK8sMonitoringName: k8s-monitoring
@@ -99,6 +99,3 @@ activeGate:
       memory: 4Gi
 
   replicas: 3
-
-# Optional: Enables and controls log-monitoring
-logMonitoring: {}

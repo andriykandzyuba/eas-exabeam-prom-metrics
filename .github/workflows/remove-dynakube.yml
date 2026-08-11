@@ -1,4 +1,4 @@
-name: Remove Dynatrace DynaKube Operator from K8s
+name: Remove DynaKube OneAgent
 
 on:
   workflow_dispatch:
