@@ -48,8 +48,7 @@ jobs:
           --create-namespace \
           --namespace dynatrace \
           --rollback-on-failure \
-          --atomic \
-          --force
+          --force-replace
 
       # Explicitly wait for the deployment rollout to confirm readiness
       - name: 'Wait for DynaKube Operator Readiness'
@@ -70,5 +69,4 @@ jobs:
           --namespace dynatrace \
           --create-namespace \
           --rollback-on-failure \
-          --atomic \
-          --force
+          --force-replace
