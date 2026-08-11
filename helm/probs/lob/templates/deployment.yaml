@@ -61,6 +61,10 @@ spec:
         - name: {{ include "lob.fullname" . }}
           image: "{{ .Values.image.repository }}/{{.Values.image.name}}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.container.args }}
+          args:
+            {{- toYaml .Values.container.args | nindent 12 }}
+          {{- end }}
           ports:
             - containerPort: {{ .Values.container.httpPort }}
               name: {{ .Values.container.httpPortName }}
@@ -131,4 +135,4 @@ spec:
       targetPort: {{ .Values.service.targetMetricsPort }}
       name: metrics
   selector:
-    {{- include "lob.selectorLabels" . | nindent 4 }}
+{{- include "lob.selectorLabels" . | nindent 4 }}

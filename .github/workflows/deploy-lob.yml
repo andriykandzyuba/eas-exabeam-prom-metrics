@@ -20,6 +20,7 @@ on:
           - python
           - go
           - js
+          - java
         default: python
       sha:
         description: 'Image Tag'
@@ -69,4 +70,5 @@ jobs:
           --set image.name=${{ github.repository }}-${{ inputs.app }} \
           --set image.tag=${{ inputs.sha }} \
           --namespace ${{ vars.K8S_NS_APPS_PREFIX }}-${{ inputs.environment }}-${{ inputs.app }} \
+          --set-json 'container.args=${{ vars.LOB_ARGS }}' \
           --create-namespace

@@ -20,6 +20,7 @@ on:
           - python
           - go
           - js
+          - java
         default: python
 
 # Required if using OIDC for authentication in 2026

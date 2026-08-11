@@ -20,6 +20,7 @@ on:
           - python
           - go
           - js
+          - java
         default: python
   push:
     branches:
