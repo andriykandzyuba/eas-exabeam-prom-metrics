@@ -1,0 +1,19 @@
+Dynatrace DynaKube Log Monitoring has been configured.
+
+Namespace: {{ include "dynakube.namespace" . }}
+DynaKube Name: {{ .Values.dynakubeName }}
+API URL: {{ .Values.apiUrl }}
+
+{{- if .Values.secret.create }}
+Secret: {{ .Values.secret.name }}
+{{- end }}
+
+ActiveGate Capabilities:
+{{- range .Values.activeGate.capabilities }}
+  - {{ . }}
+{{- end }}
+
+To verify the deployment:
+
+  kubectl get dynakube -n {{ include "dynakube.namespace" . }}
+  kubectl get pods -n {{ include "dynakube.namespace" . }}

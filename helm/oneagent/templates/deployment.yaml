@@ -12,7 +12,7 @@ metadata:
 type: Opaque
 {{- end }}
 ---
-apiVersion: dynatrace.com/v1beta5
+apiVersion: dynatrace.com/v1beta6
 kind: DynaKube
 metadata:
   name: {{ .Values.dynakubeK8sMonitoringName }}
@@ -30,7 +30,7 @@ spec:
     resources:
       {{- toYaml .Values.activeGateK8sMonitoring.resources | nindent 6 }}
 ---
-apiVersion: dynatrace.com/v1beta5
+apiVersion: dynatrace.com/v1beta6
 kind: DynaKube
 metadata:
   name: {{ .Values.dynakubeName }}
