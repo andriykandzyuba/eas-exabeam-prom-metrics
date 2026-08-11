@@ -11,3 +11,30 @@ data:
   apiToken: {{ .Values.secret.apiToken | b64enc }}
   dataIngestToken: {{ .Values.secret.dataIngestToken | b64enc }}
 {{- end }}
+---
+apiVersion: dynatrace.com/v1beta6
+kind: DynaKube
+metadata:
+  name: {{ .Values.dynakubeName }}
+  namespace: {{ include "dynakube.namespace" . }}
+  labels:
+    {{- include "dynakube.labels" . | nindent 4 }}
+spec:
+  apiUrl: {{ required "apiUrl is required" .Values.apiUrl }}
+  tokens: {{ .Values.secret.name }}
+  skipCertCheck: {{ .Values.skipCertCheck }}
+
+  metadataEnrichment:
+    enabled: {{ .Values.metadataEnrichment.enabled }}
+
+  logMonitoring:
+    {{- toYaml .Values.logMonitoring | nindent 4 }}
+
+  activeGate:
+    capabilities:
+      {{- toYaml .Values.activeGate.capabilities | nindent 6 }}
+    resources:
+      {{- toYaml .Values.activeGate.resources | nindent 6 }}
+
+  templates:
+    {{- toYaml .Values.templates | nindent 4 }}

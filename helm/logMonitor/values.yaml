@@ -25,7 +25,7 @@ skipCertCheck: false
 
 # Configuration for Metadata Enrichment
 metadataEnrichment:
-  enabled: true
+  enabled: false
 
 # Configuration for Log monitoring
 logMonitoring: {}
