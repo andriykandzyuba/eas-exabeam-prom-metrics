@@ -44,13 +44,7 @@ jobs:
 
       - name: 'Uninstall DynaKube OneAgent with Helm'
         run: |
-          helm uninstall dynatrace-oneagent \
-          --namespace dynatrace \
-          --ignore-not-found
-
-      - name: 'Uninstall Dynatrace Operator with Helm'
-        run: |
-          helm uninstall dynatrace-operator \
+          helm uninstall dynatrace-log-monitoring \
           --namespace dynatrace \
           --ignore-not-found
 
