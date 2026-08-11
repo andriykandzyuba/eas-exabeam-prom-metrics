@@ -45,11 +45,5 @@ jobs:
       - name: 'Uninstall DynaKube OneAgent with Helm'
         run: |
           helm uninstall dynatrace-log-monitoring \
-          --namespace logmonitoring \
+          --namespace dynatrace \
           --ignore-not-found
-
-      - uses: actions-hub/kubectl@master
-        env:
-          KUBE_CONFIG: ${{ secrets.KUBECONFIG_BASE64 }}
-        with:
-          args: delete namespace logmonitoring --ignore-not-found
