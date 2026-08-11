@@ -1,4 +1,4 @@
-name: Deploy Dynatrace DynaKube Operator to K8s
+name: Deploy Dynatrace Log Monitoring to K8s
 
 on:
   workflow_dispatch:
