@@ -79,8 +79,6 @@ spec:
     runAsUser: 0
     privileged: true
   env:
-    - name: OTEL_RESOURCE_ATTRIBUTES
-      value: 'dt.security_context=["team-a","team-b"]'
     - name: K8S_NODE_NAME
       valueFrom:
         fieldRef:
