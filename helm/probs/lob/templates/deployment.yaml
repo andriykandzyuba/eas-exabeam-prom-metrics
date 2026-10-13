@@ -4,6 +4,8 @@ metadata:
   name: {{ include "lob.namespace" . }}
   labels:
     {{- toYaml .Values.namespace.labels | nindent 4 }}
+  annotations:
+    {{- toYaml .Values.namespace.annotations | nindent 4 }}
 ---
 {{- if and .Values.containerRegistry.registry .Values.containerRegistry.username .Values.containerRegistry.password }}
 apiVersion: v1

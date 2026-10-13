@@ -7,6 +7,8 @@ namespace:
   name: default
   labels:
     name: default
+  annotations:
+    metadata.dynatrace.com: '{"dt.security_context":["zone-a","zone-b"]}'
 
 # Secret name
 secretName: docker-registry-secret
