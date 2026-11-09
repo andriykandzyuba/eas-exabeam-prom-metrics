@@ -21,6 +21,7 @@ on:
           - go
           - js
           - java
+          - noisy
         default: python
 
 # Required if using OIDC for authentication in 2026

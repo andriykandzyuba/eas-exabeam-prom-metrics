@@ -21,6 +21,7 @@ on:
           - go
           - js
           - java
+          - noisy
         default: python
       sha:
         description: 'Image Tag'
