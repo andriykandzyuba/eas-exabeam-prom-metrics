@@ -20,6 +20,7 @@ on:
           - go
           - js
           - java
+          - noisy
         default: python
   push:
     branches:
